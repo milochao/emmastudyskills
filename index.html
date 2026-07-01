@@ -591,10 +591,15 @@ function Home(){
   const due=dueCards(99).length;
   const grad=MOVES.filter(m=>P().moves[m.id].status==="graduated").length;
 
-  // no claims about the user's state; show only what the data actually says
-  const hasHist = P().sessions.length>0;
-  const head = due ? `${due} due today` : hasHist ? "All caught up" : "Add your material";
-  s.appendChild(div(null,`<h1 class="display" style="font-size:40px;margin-top:20px">${head}</h1>`));
+  // a stranger who gets this link needs to know what it is; a returning user does not
+  const seen = P().sessions.length>0 || P().cards.length>0;
+  if(!seen){
+    s.appendChild(div(null,`<h1 class="display" style="font-size:38px;margin-top:20px;line-height:1.1">Turn your notes into a study session.</h1>`));
+    s.appendChild(div("fp-lede","MOVE runs a few proven study techniques on your own material, one move at a time."));
+  } else {
+    const head = due ? `${due} due today` : "All caught up";
+    s.appendChild(div(null,`<h1 class="display" style="font-size:40px;margin-top:20px">${head}</h1>`));
+  }
 
   // CTA up top, so a returning night is one tap
   const cta=div("fp-cta");
