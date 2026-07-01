@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#15171C">
+<meta name="theme-color" content="#FFFFFF">
 <title>MOVE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#15171C; --surface:#1C1F26; --surface-2:#232730;
-    --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
-    --ink:#ECEAE3; --ink-dim:#969BA6; --ink-faint:#5E636E;
-    --now:#E3A551; --guess:#7FA7C9; --got:#E3A551; --good:#8FB996;
+    --bg:#FFFFFF; --surface:#F6F7F9; --surface-2:#EDEFF3;
+    --line:rgba(0,0,0,.10); --line-2:rgba(0,0,0,.16);
+    --ink:#1A1D23; --ink-dim:#565C68; --ink-faint:#8A909C;
+    --now:#4F46E5; --guess:#64748B; --got:#4F46E5; --good:#3F8452;
     --display:'Instrument Serif',Georgia,'Times New Roman',serif;
     --ui:'Inter',system-ui,-apple-system,sans-serif;
     --maxw:480px;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
+  *{box-sizing:border-box; margin:0; padding:0}
   html,body{height:100%}
   body{
     background:var(--bg); color:var(--ink); font-family:var(--ui);
@@ -53,8 +53,8 @@
     padding:16px 20px; cursor:pointer; width:100%; transition:transform .12s, background .2s, border-color .2s;
     display:flex; align-items:center; justify-content:center; gap:9px}
   .btn:active{transform:scale(.985)}
-  .btn-primary{background:var(--now); color:#1a1206}
-  .btn-primary:hover{background:#edb262}
+  .btn-primary{background:var(--now); color:#fff}
+  .btn-primary:hover{background:#4338CA}
   .btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--line-2)}
   .btn-ghost:hover{border-color:var(--ink-dim)}
   .btn-quiet{background:var(--surface); color:var(--ink-dim); border:1px solid var(--line)}
@@ -87,7 +87,7 @@
   .scale button{width:54px; height:60px; border-radius:14px; background:var(--surface);
     border:1px solid var(--line); color:var(--ink-dim); font-size:20px; font-family:var(--display); cursor:pointer; transition:.15s}
   .scale button:hover{border-color:var(--line-2); color:var(--ink)}
-  .scale button[aria-pressed=true]{background:var(--now); color:#1a1206; border-color:var(--now)}
+  .scale button[aria-pressed=true]{background:var(--now); color:#fff; border-color:var(--now)}
   .scale-ends{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-faint); margin-top:7px}
 
   /* ring */
@@ -105,7 +105,7 @@
   .cov{background:var(--surface); border:1px solid var(--line); color:var(--ink-dim);
     border-radius:11px; padding:11px 13px; cursor:pointer; font-size:14.5px; transition:.15s; text-align:left; line-height:1.35}
   .cov:hover{border-color:var(--line-2)}
-  .cov[aria-pressed=true]{background:rgba(227,165,81,.13); border-color:var(--now); color:var(--ink)}
+  .cov[aria-pressed=true]{background:rgba(79,70,229,.10); border-color:var(--now); color:var(--ink)}
   .cov[aria-pressed=true]::before{content:"✓ "; color:var(--now); font-weight:700}
 
   /* q/a step */
@@ -119,8 +119,8 @@
   .gap{margin:14px 0 6px}
   .gaptrack{position:relative; height:3px; background:var(--line); border-radius:3px; margin:54px 8px 16px}
   .pin{position:absolute; top:50%; width:15px; height:15px; border-radius:50%; transform:translate(-50%,-50%); transition:left .7s cubic-bezier(.2,.7,.2,1)}
-  .pin.g{background:var(--guess); box-shadow:0 0 0 4px rgba(127,167,201,.15)}
-  .pin.r{background:var(--got); box-shadow:0 0 0 4px rgba(227,165,81,.15)}
+  .pin.g{background:var(--guess); box-shadow:0 0 0 4px rgba(100,116,139,.16)}
+  .pin.r{background:var(--got); box-shadow:0 0 0 4px rgba(79,70,229,.15)}
   .pinlab{position:absolute; font-size:11px; letter-spacing:.04em; transform:translateX(-50%); white-space:nowrap; font-weight:600}
   .pinlab.g{top:-30px; color:var(--guess)} .pinlab.r{bottom:-26px; color:var(--got)}
   .gapnum{font-family:var(--display); font-size:15px}
@@ -141,7 +141,7 @@
   .tag{font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:600; padding:4px 9px; border-radius:7px}
   .tag.active{color:var(--now); background:rgba(227,165,81,.12)}
   .tag.grad{color:var(--good); background:rgba(143,185,150,.12)}
-  .tag.dud{color:var(--ink-faint); background:rgba(255,255,255,.04)}
+  .tag.dud{color:var(--ink-faint); background:rgba(0,0,0,.04)}
   details.rowcard summary{list-style:none; cursor:pointer; outline:none}
   details.rowcard summary::-webkit-details-marker{display:none}
   details[open] .rd{margin-top:10px}
@@ -157,7 +157,7 @@
 
   .toast{position:fixed; left:50%; bottom:30px; transform:translateX(-50%) translateY(20px); opacity:0;
     background:var(--surface-2); border:1px solid var(--line-2); color:var(--ink); padding:13px 18px;
-    border-radius:12px; font-size:14px; pointer-events:none; transition:.3s; z-index:50; max-width:90vw}
+    border-radius:12px; font-size:14px; pointer-events:none; transition:.3s; z-index:50; max-width:90vw; box-shadow:0 10px 34px rgba(0,0,0,.13)}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 
   .celebrate{text-align:center; padding:30px 0}
@@ -182,17 +182,17 @@
 
   /* the session flow: entry + exit, warm rail */
   .zone.flow{border-left:3px solid var(--now); background:linear-gradient(90deg, rgba(227,165,81,.05), rgba(227,165,81,0) 55%)}
-  .zone.flow .zname{color:#E9B871}
+  .zone.flow .zname{color:#4F46E5}
 
   /* hero: her channel. warmest, most space, biggest type (Scher amplify the hero) */
-  .zone.hero{background:linear-gradient(135deg, rgba(227,165,81,.13), rgba(227,165,81,.035)); border-color:rgba(227,165,81,.36); padding:24px 22px}
+  .zone.hero{background:linear-gradient(135deg, rgba(79,70,229,.10), rgba(227,165,81,.035)); border-color:rgba(227,165,81,.36); padding:24px 22px}
   .zone.hero .ztitle{margin-bottom:4px}
-  .zone.hero .zname{font-family:var(--display); font-size:28px; letter-spacing:0; text-transform:none; color:#F0C079; font-weight:400}
+  .zone.hero .zname{font-family:var(--display); font-size:28px; letter-spacing:0; text-transform:none; color:#4F46E5; font-weight:400}
   .zone.hero .herosub{font-family:var(--display); font-style:italic; font-size:16px; color:var(--ink-dim); margin-bottom:16px}
 
   /* foundation: cool, the ground the moves stand on (recedes) */
   .zone.base{background:linear-gradient(180deg, rgba(127,167,201,.08), rgba(127,167,201,.02)); border-color:rgba(127,167,201,.22)}
-  .zone.base .zname{color:#9DBFDB}
+  .zone.base .zname{color:#2E6FA6}
 
   /* skip: dim, set aside */
   .zone.skip{background:transparent; border-style:dashed; opacity:.72}
@@ -208,13 +208,13 @@
   .zone.base .mchip{background:rgba(127,167,201,.07); border-color:rgba(127,167,201,.2); font-size:13.5px}
   .zone.base .mchip:hover{border-color:rgba(127,167,201,.46)}
   .zone.base .mchip[aria-pressed=true]{background:rgba(127,167,201,.2); border-color:var(--guess)}
-  .zone.skip .mchip{background:rgba(255,255,255,.02); border-color:var(--line); color:var(--ink-dim); border-style:dashed; font-size:13px}
+  .zone.skip .mchip{background:rgba(0,0,0,.02); border-color:var(--line); color:var(--ink-dim); border-style:dashed; font-size:13px}
 
   .zdetail{font-size:14.5px; color:var(--ink-dim); line-height:1.55}
   .zdetail.show{margin-top:14px}
   .zone.hero .zdetail.show{font-size:15.5px; color:#D8D3C7}
   .zdetail .zsrc{display:block; color:var(--ink-faint); font-size:12.5px; margin-top:7px}
-  .ztag{font-size:10px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:4px 9px; border-radius:7px; background:rgba(227,165,81,.18); color:#F0C079; white-space:nowrap}
+  .ztag{font-size:10px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:4px 9px; border-radius:7px; background:rgba(227,165,81,.18); color:#4F46E5; white-space:nowrap}
   .zstatus{font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--good); font-weight:600; margin-left:7px}
 
   /* ---- Front page (position, reason to use, reason to believe) ---- */
@@ -223,16 +223,16 @@
   .fp-lede{font-size:17px; color:var(--ink-dim); line-height:1.5; margin-top:16px; max-width:33em}
   .fp-cta{margin-top:24px; max-width:380px}
   .fp-sec{margin-top:32px; max-width:39em}
-  .fp-h{font-family:var(--ui); font-size:12px; letter-spacing:.15em; text-transform:uppercase; color:#E9B871; font-weight:600; margin-bottom:11px}
+  .fp-h{font-family:var(--ui); font-size:12px; letter-spacing:.15em; text-transform:uppercase; color:#4F46E5; font-weight:600; margin-bottom:11px}
   .fp-body{font-size:15.5px; color:var(--ink); line-height:1.62}
   .fp-body .dim{color:var(--ink-dim)}
   .proof{margin:18px 0 4px; max-width:430px}
   .prow{display:flex; align-items:center; gap:12px; margin:8px 0}
   .prow .plab{width:92px; font-size:13px; color:var(--ink-dim); text-align:right; flex:none}
-  .ptrack{flex:1; height:28px; background:rgba(255,255,255,.05); border-radius:8px; overflow:hidden}
+  .ptrack{flex:1; height:28px; background:rgba(0,0,0,.05); border-radius:8px; overflow:hidden}
   .pfill{height:100%; border-radius:8px; display:flex; align-items:center; justify-content:flex-end; padding-right:10px; font-size:12.5px; font-weight:600; min-width:34px}
-  .pfill.dim{background:rgba(255,255,255,.14); color:var(--ink-dim)}
-  .pfill.hot{background:linear-gradient(90deg,#C8893C,#E9B871); color:#1a1206}
+  .pfill.dim{background:rgba(0,0,0,.14); color:var(--ink-dim)}
+  .pfill.hot{background:linear-gradient(90deg,#C8893C,#4F46E5); color:#fff}
   .proofcap{font-size:12px; color:var(--ink-faint); margin-top:9px}
   .retire{display:inline-block; margin-top:13px; font-family:var(--ui); font-size:13px; font-weight:500; color:var(--good);
     background:rgba(143,185,150,.1); border:1px solid rgba(143,185,150,.3); border-radius:9px; padding:8px 13px; cursor:pointer}
@@ -255,12 +255,12 @@
   .tskip{margin-top:26px}
   .tskip-h{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; margin-bottom:12px}
   .tskip-chips{display:flex; flex-wrap:wrap; gap:8px}
-  .tskip .d{background:rgba(255,255,255,.02); border:1px dashed var(--line-2); color:var(--ink-dim); border-radius:9px; padding:7px 11px; font-size:13px; cursor:pointer; font-family:var(--ui)}
+  .tskip .d{background:rgba(0,0,0,.02); border:1px dashed var(--line-2); color:var(--ink-dim); border-radius:9px; padding:7px 11px; font-size:13px; cursor:pointer; font-family:var(--ui)}
 
   /* station detail: bottom sheet (mobile-first) */
   .sheet{position:fixed; left:0; right:0; bottom:0; z-index:60; margin:0 auto; max-width:var(--maxw);
     background:var(--surface); border-top:1px solid var(--line-2); border-radius:18px 18px 0 0;
-    padding:18px 20px calc(26px + env(safe-area-inset-bottom)); box-shadow:0 -16px 44px rgba(0,0,0,.55);
+    padding:18px 20px calc(26px + env(safe-area-inset-bottom)); box-shadow:0 -16px 44px rgba(0,0,0,.16);
     transform:translateY(115%); transition:transform .22s cubic-bezier(.2,.7,.2,1)}
   .sheet.show{transform:translateY(0)}
   .sheet-top{display:flex; align-items:flex-start; justify-content:space-between; gap:12px}
@@ -282,8 +282,28 @@
 "use strict";
 
 /* ============================================================
-   MOVE — single file. Brief: DWG LIB-002 REV 2. Content: LIB-002-A.
+   MOVE, single file. Brief: DWG LIB-002 REV 2. Content: LIB-002-A.
    Every move's copy and scoring traces to the verified dossier.
+
+   Build REV 4 (safe set, no dependency on the two open decisions):
+   - New Material screen: browse studied topics, their generated items,
+     and the muddiest-point log. Her repository to come back to.
+   - Cards now carry a topic so Material can group them.
+   - Summary now surfaces the muddiest point just named and adds one
+     if-then plan for next time (built locally, not from a model call).
+   - Corrected the graduation copy: it no longer implies the app detects
+     unprompted use. Retirement is the manual button in the moves map.
+   - Warmth pass on the celebrate screen (second person).
+
+   STILL PENDING A DECISION (not built here):
+   - Generation: production has no Anthropic endpoint, so questions fall
+     back to a local regex generator. Needs a serverless function to hold
+     a key and call Claude, then a type-aware prompt. Nothing else changes.
+   - Graduation: staged withdrawal (app stops naming the move, asks
+     "which move here?", picking it unprompted across N sessions is the
+     gate). Today it is a self-report button. That is the unobservable
+     trigger; the staged version is the fix, and it changes how a session
+     feels, so it waits for a yes.
    ============================================================ */
 
 /* ---------- the generation prompt (tightly constrained, live) ----------
@@ -470,10 +490,10 @@ function P(){ return DB.profiles[DB.active]; }
 function today(){ return Math.floor(Date.now()/86400000); }
 
 /* ------------------------------- SM-2 ------------------------------- */
-function addCards(items){
+function addCards(items, topic){
   const p=P(); const t=today();
   items.forEach(it=>{
-    p.cards.push({ id:"c"+Math.random().toString(36).slice(2,9), q:it.q, a:it.a,
+    p.cards.push({ id:"c"+Math.random().toString(36).slice(2,9), q:it.q, a:it.a, topic:topic||"",
       ef:2.5, interval:0, reps:0, due:t, born:t });
   });
 }
@@ -549,7 +569,7 @@ function go(screen){ S.screen=screen; render(); window.scrollTo(0,0); }
 function render(){
   app.innerHTML="";
   app.classList.remove("wide");
-  const fn = ({home:Home, capture:Capture, session:Session, summary:Summary, library:Library})[S.screen] || Home;
+  const fn = ({home:Home, capture:Capture, session:Session, summary:Summary, library:Library, material:Material})[S.screen] || Home;
   app.appendChild(fn());
 }
 function div(cls,html){ const d=document.createElement("div"); if(cls)d.className=cls; if(html!=null)d.innerHTML=html; return d; }
@@ -571,9 +591,10 @@ function Home(){
   const due=dueCards(99).length;
   const grad=MOVES.filter(m=>P().moves[m.id].status==="graduated").length;
 
-  // POSITION: what this is, the sharp claim
-  s.appendChild(div(null,`<h1 class="fp-claim">Most studying<br>just feels like work.</h1>`));
-  s.appendChild(div("fp-lede","MOVE runs the few things that actually make it stick, on the homework you already have. About twenty minutes a day. Then it gets out of your way for good."));
+  // no claims about the user's state; show only what the data actually says
+  const hasHist = P().sessions.length>0;
+  const head = due ? `${due} due today` : hasHist ? "All caught up" : "Add your material";
+  s.appendChild(div(null,`<h1 class="display" style="font-size:40px;margin-top:20px">${head}</h1>`));
 
   // CTA up top, so a returning night is one tap
   const cta=div("fp-cta");
@@ -583,27 +604,13 @@ function Home(){
   s.appendChild(cta);
   if(grad){ s.appendChild(div("faint",`<div style="margin-top:12px;font-size:13px">${grad} move${grad>1?"s":""} retired. You do ${grad>1?"those":"that"} on your own now.</div>`)); }
 
-  // REASON TO USE: why bother
-  s.appendChild(div("fp-sec",`<div class="fp-h">Why bother</div>
-    <div class="fp-body">Rereading and highlighting feel productive. They mostly aren't: people who reread were down to 40% a week later, and sure they'd remember more than they did. <span class="dim">The stuff that actually works feels worse while you do it.</span> Closing the book and dragging it back from memory. Spacing it out. Drawing it. MOVE walks you through those one screen at a time, and before each one you call your shot, so you see the gap between what you think you know and what you can actually do. The test stops being a surprise.</div>`));
-
-  // REASON TO BELIEVE: why trust it, with proof
-  const rtb=div("fp-sec");
-  rtb.innerHTML=`<div class="fp-h">Why believe it</div>
-    <div class="fp-body">None of this is one person's opinion. Every move here beat the usual ones in controlled studies. The clearest case: test yourself on something once and you remember about twice as much a week later as rereading it.</div>`;
-  const proof=div("proof");
-  proof.innerHTML=`
-    <div class="prow"><span class="plab">Reread it</span><div class="ptrack"><div class="pfill dim" style="width:40%">~40%</div></div></div>
-    <div class="prow"><span class="plab">Test yourself</span><div class="ptrack"><div class="pfill hot" style="width:80%">~80%</div></div></div>
-    <div class="proofcap">Recall one week later. Karpicke and Roediger, Science, 2008.</div>`;
-  rtb.appendChild(proof);
-  rtb.appendChild(div("fp-body",`<div style="margin-top:14px">It's pulled from nineteen books of learning science and cut down to what holds up. And it never fakes your progress: the only score is the gap between your guess and what you got, never a star for showing up.</div>`));
-  s.appendChild(rtb);
+  // proof lives one tap away in the moves map, not on the home screen
 
   // daily hub
   const ll=div("linklist"); ll.style.marginTop="30px";
   const a=div("tlink"); a.textContent="See every move"; a.onclick=()=>go("library");
-  ll.appendChild(a);
+  const a2=div("tlink"); a2.textContent="What you've studied"; a2.onclick=()=>go("material");
+  ll.appendChild(a); ll.appendChild(a2);
   s.appendChild(ll);
 
   s.appendChild(div("spacer"));
@@ -645,7 +652,7 @@ function Capture(){
     go1.textContent="Reading it…"; go1.disabled=true;
     const items=await generateItems(topic.value.trim(), txt);
     if(!items.length){ go1.textContent="Build my session"; go1.disabled=false; toast("Couldn't find clear items. Try fuller sentences."); return; }
-    addCards(items); save();
+    addCards(items, topic.value.trim()); save();
     buildSession(S.pendingMode, topic.value.trim()||"your work", items);
   };
   s.appendChild(go1);
@@ -899,7 +906,7 @@ function muddiestBeat(s){
   const mr=div(); mr.style.marginTop="10px"; mr.appendChild(voiceButton(ta,"Speak it")); s.appendChild(mr);
   s.appendChild(div("spacer"));
   const b=div("btn btn-primary"); b.textContent="Finish session";
-  b.onclick=()=>{ if(ta.value.trim()) P().muddiest.unshift({t:Date.now(), text:ta.value.trim()}); endSession(); };
+  b.onclick=()=>{ if(ta.value.trim()) P().muddiest.unshift({t:Date.now(), text:ta.value.trim(), topic:(S.sess&&S.sess.topic)||""}); endSession(); };
   s.appendChild(b);
   const skip=div("tlink center"); skip.style.marginTop="12px"; skip.textContent="Nothing fuzzy, skip"; skip.onclick=endSession;
   s.appendChild(skip);
@@ -934,10 +941,26 @@ function Summary(){
     s.appendChild(div("note mt","First data point logged. The trend shows up once you've done a few."));
   }
 
-  // graduation nudge
+  // carry forward: the muddiest point just named becomes tomorrow's opening (Lovett)
+  const freshMud = (P().muddiest[0] && (Date.now()-P().muddiest[0].t < 3600000)) ? P().muddiest[0].text : null;
+  const topic = ss.topic || "this";
+  if(freshMud){
+    s.appendChild(div("mt",`<div class="field-lab">Carrying forward</div>`));
+    s.appendChild(div("rowcard",`<div class="rd" style="margin:0">You flagged <b style="color:var(--ink)">${freshMud}</b>. That's where you start next time, not the easy stuff.</div>`));
+  }
+
+  // one if-then plan for next time (implementation intention, built locally, not a model call)
+  const shortMud = freshMud ? (freshMud.length>44 ? freshMud.slice(0,44).trim()+"…" : freshMud) : null;
+  const plan = shortMud
+    ? `When you next open ${topic}, start with ${shortMud} before anything else.`
+    : `When you next sit down with ${topic}, close the book and dump what you remember before you read a thing.`;
+  s.appendChild(div("mt",`<div class="field-lab">Your plan for next time</div>`));
+  s.appendChild(div("rowcard",`<div style="margin:0;font-family:var(--display);font-size:20px;line-height:1.3;color:var(--ink)">${plan}</div>`));
+
+  // graduation nudge (retirement is the manual button in the moves map, not auto-detected)
   s.appendChild(div("spacer"));
   const grad=MOVES.filter(m=>P().moves[m.id].status==="active").length;
-  s.appendChild(div("center faint",`<div style="font-size:13px;margin-bottom:14px">${grad} move${grad!==1?"s":""} still being coached. They retire when you do them without being asked.</div>`));
+  s.appendChild(div("center faint",`<div style="font-size:13px;margin-bottom:14px">${grad} move${grad!==1?"s":""} still being coached. When you catch yourself running one without the app asking, retire it yourself in the moves map.</div>`));
   const b=div("btn btn-primary"); b.textContent="Back to start"; b.onclick=()=>go("home"); s.appendChild(b);
   return s;
 }
@@ -1004,6 +1027,73 @@ function voiceButton(target, label){
   return b;
 }
 
+/* --------------------------- MATERIAL (her shelf) ---------------------------
+   Browse every topic she has run, the items generated from it, and the
+   muddiest-point log. Nothing graded. Reads straight from saved cards. */
+function Material(){
+  const s=div("scr"); s.appendChild(topbar(false));
+  const p=P(); const t=today();
+  s.appendChild(div("boardhead",`<div class="eyebrow mb-s">Your material</div>
+    <h1 class="display">Everything you've run.</h1>
+    <div class="note mt">Every topic you've studied, the questions built from it, and what you flagged as fuzzy. Nothing here is graded. It's yours to come back to.</div>`));
+
+  if(!p.cards.length){
+    s.appendChild(div("lede mt","Nothing here yet. Run a session and your topics show up, ready to bring back."));
+    s.appendChild(div("spacer"));
+    const b=div("btn btn-primary"); b.textContent="Start a session"; b.onclick=()=>go("home"); s.appendChild(b);
+    return s;
+  }
+
+  // group cards by topic, newest first
+  const groups={};
+  p.cards.forEach(c=>{ const k=c.topic && c.topic.trim() ? c.topic.trim() : "Earlier sessions"; (groups[k]=groups[k]||[]).push(c); });
+  const order=Object.keys(groups).sort((a,b)=>{
+    const bornA=Math.max.apply(null, groups[a].map(c=>c.born));
+    const bornB=Math.max.apply(null, groups[b].map(c=>c.born));
+    return bornB-bornA;
+  });
+
+  s.appendChild(div("section-lab","Topics"));
+  order.forEach(name=>{
+    const cards=groups[name];
+    const due=cards.filter(c=>c.due<=t).length;
+    const settling=cards.filter(c=>c.interval>=7).length; // scheduled a week+ out
+    const nextDue=Math.min.apply(null, cards.map(c=>c.due-t));
+    const det=document.createElement("details"); det.className="rowcard";
+    const sub = due
+      ? `${due} ready to bring back`
+      : `next one comes back in ${Math.max(0,nextDue)} day${nextDue===1?"":"s"}`;
+    det.innerHTML=`<summary><div class="rowhead"><div class="rt">${name}</div>
+      <span class="tag ${due?'active':'dud'}">${cards.length} item${cards.length!==1?"s":""}</span></div>
+      <div class="rd">${sub}${settling?` \u00b7 ${settling} settling in`:""}</div></summary>`;
+    const body=div(); body.style.marginTop="12px";
+    cards.forEach(c=>{
+      const item=div(); item.style.cssText="padding:11px 0;border-top:1px solid var(--line)";
+      item.innerHTML=`<div style="font-family:var(--display);font-size:18px;line-height:1.25">${c.q.replace(/_____/g,"___")}</div>
+        <div style="color:var(--good);font-size:14px;margin-top:5px">${c.a}</div>`;
+      body.appendChild(item);
+    });
+    det.appendChild(body);
+    s.appendChild(det);
+  });
+
+  // muddiest log
+  if(p.muddiest && p.muddiest.length){
+    s.appendChild(div("section-lab","What you've flagged as fuzzy"));
+    p.muddiest.slice(0,12).forEach(mud=>{
+      const row=div("rowcard");
+      const ds=new Date(mud.t).toLocaleDateString(undefined,{month:"short",day:"numeric"});
+      const where = mud.topic && mud.topic.trim() ? ` \u00b7 ${mud.topic.trim()}` : "";
+      row.innerHTML=`<div class="rd" style="margin:0"><span class="faint" style="font-size:12px">${ds}${where}</span><br>${mud.text}</div>`;
+      s.appendChild(row);
+    });
+  }
+
+  s.appendChild(div("spacer"));
+  const b=div("btn btn-ghost mt"); b.textContent="Back"; b.style.maxWidth="320px"; b.onclick=()=>go("home"); s.appendChild(b);
+  return s;
+}
+
 /* ----------------------------- LIBRARY (transit map) ----------------------------- */
 function Library(){
   const s=div("scr"); s.appendChild(topbar(false));
@@ -1023,7 +1113,7 @@ function Library(){
     return WRAP[name] || {desc:"",src:""};
   }
 
-  const HEX={learn:"#E3A551", keep:"#7FA7C9", exam:"#8FB996", unstuck:"#B08CC9", node:"#ECEAE3"};
+  const HEX={learn:"#4F46E5", keep:"#2E6FA6", exam:"#3F8452", unstuck:"#8A5BB0", node:"#1A1D23"};
   const LINE={
     learn:{name:"Learn It", desc:"New material, start to finish. Guess, take a swing before you\u2019ve studied, turn it into your own picture, pull it back cold."},
     keep:{name:"Keep It", desc:"Bring old material back after a gap so it sticks. A short line: guess, space it, review, out."},
@@ -1057,15 +1147,15 @@ function Library(){
   ORDER.forEach((r,i)=>{
     const name=r[0], lane=r[1], x=laneX[lane], y=yOf(i); pos[name]=[x,y];
     const big=(lane==="xchg"||lane==="term"), col=big?HEX.node:HEX[lane];
-    if(big){ dots.push(`<circle cx="${x}" cy="${y}" r="9" fill="#15171C" stroke="${HEX.node}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="3.4" fill="${HEX.node}"/>`); }
-    else { dots.push(`<circle cx="${x}" cy="${y}" r="5.5" fill="#15171C" stroke="${col}" stroke-width="3"/>`); }
+    if(big){ dots.push(`<circle cx="${x}" cy="${y}" r="9" fill="#FFFFFF" stroke="${HEX.node}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="3.4" fill="${HEX.node}"/>`); }
+    else { dots.push(`<circle cx="${x}" cy="${y}" r="5.5" fill="#FFFFFF" stroke="${col}" stroke-width="3"/>`); }
     const it=libItem(name), retired=it.status==="graduated";
     const sub = lane==="xchg" ? "interchange \u00b7 every line" : lane==="term" ? "terminus \u00b7 all lines end" : "";
-    labels.push(`<text x="${LX}" y="${sub?y-2:y+4.5}" fill="${big?HEX.node:'#ECEAE3'}" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="${big?600:450}"${retired?' opacity="0.45"':''}>${name}${retired?'  \u2713':''}</text>`);
+    labels.push(`<text x="${LX}" y="${sub?y-2:y+4.5}" fill="${big?HEX.node:'#1A1D23'}" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="${big?600:450}"${retired?' opacity="0.45"':''}>${name}${retired?'  \u2713':''}</text>`);
     if(sub) labels.push(`<text x="${LX}" y="${y+13}" fill="#5E636E" font-family="Inter,system-ui,sans-serif" font-size="10.5" letter-spacing="0.4">${sub}</text>`);
     hits.push(`<rect class="thit" data-st="${name}" x="0" y="${y-rowH/2}" width="360" height="${rowH}" fill="transparent"/>`);
   });
-  const halo=`<circle id="thalo" cx="-99" cy="-99" r="12" fill="none" stroke="#ECEAE3" stroke-width="2"/>`;
+  const halo=`<circle id="thalo" cx="-99" cy="-99" r="12" fill="none" stroke="#1A1D23" stroke-width="2"/>`;
   const svg=`<svg viewBox="0 0 360 ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MOVE lines and stations">${strokes.join("")}${halo}${dots.join("")}${labels.join("")}${hits.join("")}</svg>`;
   const mapWrap=div("tmap"); mapWrap.innerHTML=svg; s.appendChild(mapWrap);
 
@@ -1078,8 +1168,8 @@ function Library(){
     const it=libItem(name); const lane=laneOf[name];
     let lineLabel, col;
     if(!lane){
-      if(LIBRARY.why.find(w=>w.name===name)){ lineLabel="Why it works"; col="#7FA7C9"; }
-      else if(EXCLUDED.find(x=>x.name===name)){ lineLabel="Not on the map"; col="#969BA6"; }
+      if(LIBRARY.why.find(w=>w.name===name)){ lineLabel="Why it works"; col="#2E6FA6"; }
+      else if(EXCLUDED.find(x=>x.name===name)){ lineLabel="Not on the map"; col="#565C68"; }
       else { lineLabel=""; col=HEX.learn; }
     } else { lineLabel=laneName[lane]; col=(lane==="xchg"||lane==="term")?HEX.node:(HEX[lane]||HEX.learn); }
     sheet.innerHTML=`<div class="sheet-top"><div><div class="sheet-nm">${name}</div>
@@ -1122,6 +1212,11 @@ function Library(){
   EXCLUDED.forEach(x=>{ const c=document.createElement("button"); c.className="d"; c.textContent=x.name; c.onclick=()=>openStation(x.name); sc.appendChild(c); });
   skip.appendChild(sc); s.appendChild(skip);
 
+  const proofNote=div("tskip"); proofNote.style.marginTop="26px";
+  proofNote.appendChild(div("tskip-h","Why believe it"));
+  proofNote.appendChild(div("tkey-ds","None of this is opinion. Every move here beat the usual ones in controlled studies. Test yourself on something once and you remember about twice as much a week later as rereading it. Karpicke and Roediger, Science, 2008."));
+  s.appendChild(proofNote);
+
   s.appendChild(div("spacer"));
   const b=div("btn btn-ghost mt"); b.textContent="Back"; b.style.maxWidth="320px"; b.onclick=()=>go("home"); s.appendChild(b);
   return s;
@@ -1134,7 +1229,7 @@ function celebrate(m){
   const s=div("scr");
   s.appendChild(div("spacer"));
   s.appendChild(div("celebrate",`<div class="big">${m.name}<br>retired.</div>
-    <div class="lede" style="margin:18px auto 0">She does this without being asked now. The app's job on this one is done. That's the whole point.</div>`));
+    <div class="lede" style="margin:18px auto 0">You do this on your own now. The app's job on this one is done. That was always the point.</div>`));
   s.appendChild(div("spacer"));
   const b=div("btn btn-primary"); b.textContent="Good"; b.onclick=()=>go("home");
   s.appendChild(b);
