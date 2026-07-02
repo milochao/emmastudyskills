@@ -80,6 +80,12 @@
   .back.on{display:inline-flex}
   @media (hover:hover){ .back:hover{background:rgba(0,0,0,.09)} }
 
+  /* flat panel for families of 6 or fewer: everything visible, no spin */
+  .panel{position:relative; border-radius:.75em; padding:.5em; box-shadow:inset 0 0 0 2px var(--edge)}
+  .panel.hide{display:none}
+  .pgrid{display:grid; grid-template-columns:1fr 1fr; gap:.5em}
+  .pgrid .cell{height:10.5em}
+
   /* face pager dots */
   .dots{position:absolute; bottom:calc(40px + env(safe-area-inset-bottom)); left:0; right:0; display:flex; gap:7px; justify-content:center; z-index:5; pointer-events:none}
   .dots.hide{display:none}
@@ -122,6 +128,7 @@
   <div id="stage">
     <div class="cube" id="cubeF"></div>
     <div class="cube hide" id="cubeT"></div>
+    <div class="panel hide" id="panelEl"></div>
   </div>
   <div class="hint" id="hint">Drag to spin. Tap a family to open it.</div>
   <div class="dots hide" id="dots"></div>
@@ -262,7 +269,7 @@ const ICON={
 
 /* ---------- responsive sizing: one number drives geometry and type ---------- */
 const stage=document.getElementById("stage");
-const cubeF=document.getElementById("cubeF"), cubeT=document.getElementById("cubeT");
+const cubeF=document.getElementById("cubeF"), cubeT=document.getElementById("cubeT"), panelEl=document.getElementById("panelEl");
 let SZ=280, FACE_TF=[];
 function sizeCube(){
   const r=stage.getBoundingClientRect();
@@ -277,8 +284,8 @@ function sizeCube(){
   [cubeF,cubeT].forEach(c=>{
     c.style.setProperty("--sz",SZ+"px");
     c.style.fontSize=(SZ/280*16)+"px";
-    [...c.children].forEach((f,i)=>f.style.transform=FACE_TF[i]);
   });
+  [...cubeF.children].forEach((f,i)=>f.style.transform=FACE_TF[i]);
 }
 
 /* ---------- build level-1 (families) cube ---------- */
@@ -299,51 +306,74 @@ const legend=document.getElementById("legend");
 FAM.forEach(f=>{ const l=document.createElement("div"); l.className="lg";
   l.innerHTML=`<span class="sw" style="background:${f.c}"></span>${f.n}`; legend.appendChild(l); });
 const dotsEl=document.getElementById("dots");
-for(let i=0;i<6;i++){ const d=document.createElement("div"); d.className="dot"; dotsEl.appendChild(d); }
+function buildDots(n){
+  dotsEl.innerHTML="";
+  for(let i=0;i<n;i++){ const d=document.createElement("div"); d.className="dot"; dotsEl.appendChild(d); }
+}
 function updateDots(){
-  if(level!=="family"){ dotsEl.classList.add("hide"); return; }
+  if(level!=="family" || shape==="panel" || faceCount<2){ dotsEl.classList.add("hide"); return; }
   dotsEl.classList.remove("hide");
-  const fi=frontFace(rotX,rotY);
+  const step=360/faceCount;
+  const fi=((Math.round(-rotY/step))%faceCount+faceCount)%faceCount;
   [...dotsEl.children].forEach((d,i)=>d.classList.toggle("on",i===fi));
 }
-/* which face index is closest to front for a given rotation */
-function frontFace(x,y){
-  const nx=Math.round(x/90)*90, ny=((Math.round(y/90)*90)%360+360)%360;
-  if(nx>=90) return 4;           /* looking at bottom face brought front */
-  if(nx<=-90) return 3;          /* top */
-  return {0:0, 90:2, 180:5, 270:1}[ny];
-}
 
-/* ---------- level-2 (a family's techniques) ---------- */
+/* ---------- level-2: shape follows the count ----------
+   <=6 items: flat panel, everything visible, no spin
+   <=8 items: flip card, two faces of four
+   more:      square prism, four faces of four, one swipe axis */
+function makeCell(t,fam,first,ci){
+  const cell=document.createElement("button");
+  if(t){ cell.className="cell"+(t===first?" startcell":""); cell.style.background=fam.c; cell.style.color=inkFor(fam.c);
+    cell.innerHTML=(t===first?'<span class="stag">START HERE</span>':'')+'<span class="ic">'+svg(ICON[t.n])+'</span>'+t.n;
+    cell.addEventListener("click",()=>{ if(moved) return; openCard(t,ci); });
+  } else { cell.className="cell empty"; cell.style.background=shade(fam.c,0.82); }
+  return cell;
+}
 function openFamily(ci){
   const fam=FAM[ci]; curFam=ci;
   const items=T.filter(t=>t.fam.includes(ci));
-  const first=items[0];
-  cubeT.innerHTML="";
-  const perFace=[[],[],[],[],[],[]];
-  items.forEach((t,i)=>perFace[Math.floor(i/4)].push(t));   /* fill each face before moving on */
-  for(let fi=0; fi<6; fi++){
-    const face=document.createElement("div"); face.className="face";
-    face.style.background=shade(fam.c,0.9); face.style.transform=FACE_TF[fi];
-    const grid=document.createElement("div"); grid.className="tgrid";
-    for(let k=0;k<4;k++){
-      const t=perFace[fi][k];
-      const cell=document.createElement("button");
-      if(t){ cell.className="cell"+(t===first?" startcell":""); cell.style.background=fam.c; cell.style.color=inkFor(fam.c);
-        cell.innerHTML=(t===first?'<span class="stag">START HERE</span>':'')+'<span class="ic">'+svg(ICON[t.n])+'</span>'+t.n;
-        cell.addEventListener("click",()=>{ if(moved) return; openCard(t,ci); });
-      } else { cell.className="cell empty"; cell.style.background=shade(fam.c,0.82); }
-      grid.appendChild(cell);
-    }
-    face.appendChild(grid); cubeT.appendChild(face);
-  }
+  const first=FAM[ci].n==="Not On The Map"?null:items[0];   /* anti-patterns get no start marker */
   level="family";
-  cubeF.classList.add("hide"); cubeT.classList.remove("hide");
-  legend.classList.add("hide");
-  document.getElementById("hint").textContent="Swipe to turn. Tap a technique for its card.";
+  cubeF.classList.add("hide"); legend.classList.add("hide");
+
+  if(items.length<=6){
+    /* flat panel */
+    shape="panel"; faceCount=1;
+    panelEl.innerHTML=""; panelEl.style.background=shade(fam.c,0.9);
+    panelEl.style.width=Math.min(SZ*1.18, stage.clientWidth-28)+"px";
+    panelEl.style.fontSize=(SZ/280*16)+"px";
+    const grid=document.createElement("div"); grid.className="pgrid";
+    const slots=Math.ceil(items.length/2)*2;
+    for(let k=0;k<slots;k++) grid.appendChild(makeCell(items[k],fam,first,ci));
+    panelEl.appendChild(grid);
+    cubeT.classList.add("hide"); panelEl.classList.remove("hide");
+    stage.style.cursor="default";
+    document.getElementById("hint").textContent="Tap a technique for its card.";
+  } else {
+    /* 3D: flip card (2 faces) or prism (4 faces) */
+    const nFaces=items.length<=8?2:4;
+    shape=nFaces===2?"flip":"prism"; faceCount=nFaces;
+    const depth=nFaces===4?SZ/2:1;
+    cubeT.innerHTML="";
+    for(let fi=0; fi<nFaces; fi++){
+      const face=document.createElement("div"); face.className="face";
+      face.style.background=shade(fam.c,0.9);
+      face.style.transform=`rotateY(${fi*(360/nFaces)}deg) translateZ(${depth}px)`;
+      const grid=document.createElement("div"); grid.className="tgrid";
+      for(let k=0;k<4;k++) grid.appendChild(makeCell(items[fi*4+k],fam,first,ci));
+      face.appendChild(grid); cubeT.appendChild(face);
+    }
+    cubeT.classList.remove("hide"); panelEl.classList.add("hide");
+    stage.style.cursor="grab";
+    document.getElementById("hint").textContent=
+      nFaces===2?"Swipe to flip it over. Tap a technique for its card."
+                :"Swipe to turn. Tap a technique for its card.";
+    buildDots(nFaces);
+  }
   document.getElementById("hint").classList.remove("fade");
   setBack(`&larr; All families`); document.getElementById("ctx").textContent=`${fam.n} · ${items.length}`;
-  setRotation(0,0);      /* open face-on: readable immediately */
+  setRotation(0,0);
   updateDots();
 }
 
@@ -375,20 +405,22 @@ const backBtn=document.getElementById("back");
 function setBack(html){ backBtn.innerHTML=html; backBtn.classList.add("on"); }
 backBtn.addEventListener("click",()=>{
   if(level==="family"){
-    level="families";
-    cubeT.classList.add("hide"); cubeF.classList.remove("hide");
+    level="families"; shape="cube"; faceCount=6;
+    cubeT.classList.add("hide"); panelEl.classList.add("hide"); cubeF.classList.remove("hide");
     legend.classList.remove("hide");
+    stage.style.cursor="grab";
     document.getElementById("hint").textContent="Drag to spin. Tap a family to open it.";
     document.getElementById("hint").classList.add("fade");
     document.getElementById("ctx").textContent="All 47 · six families";
     backBtn.classList.remove("on");
-    setRotation(-18,-28); snapSoon();      /* return to the hero angle, then settle */
+    setRotation(-18,-28);      /* rest at the hero angle; snapping resumes after the next drag */
     updateDots();
   }
 });
 
 /* ---------- rotation engine: rAF-driven, inertia, snaps to the nearest face ---------- */
 let level="families", curFam=0, moved=false;
+let shape="cube", faceCount=6;   /* cube | prism | flip | panel */
 let rotX=-18, rotY=-28;          /* current */
 let vX=0, vY=0;                  /* velocity, deg/frame */
 let down=false, lx=0, ly=0, lt=0;
@@ -396,13 +428,19 @@ let mode="rest";                 /* rest | drag | inertia | snap */
 let tX=0, tY=0;                  /* snap target */
 let rafId=null;
 
-function activeCube(){ return level==="family"?cubeT:cubeF; }
-function paint(){ activeCube().style.transform=`rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
+function rotatable(){ return !(level==="family" && shape==="panel"); }
+function paint(){
+  if(!rotatable()) return;
+  const el=level==="family"?cubeT:cubeF;
+  el.style.transform=`rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+}
 function setRotation(x,y){ rotX=x; rotY=y; vX=vY=0; mode="rest"; paint(); }
 
+function snapStepY(){ return shape==="flip"?180:90; }
 function nearestTarget(){
-  tX=Math.max(-90,Math.min(90,Math.round(rotX/90)*90));
-  tY=Math.round(rotY/90)*90;
+  tX=shape==="cube"?Math.max(-90,Math.min(90,Math.round(rotX/90)*90)):0;
+  const s=snapStepY();
+  tY=Math.round(rotY/s)*s;
 }
 function snapSoon(){ nearestTarget(); mode="snap"; run(); }
 
@@ -425,22 +463,22 @@ function run(){ if(rafId===null) rafId=requestAnimationFrame(tick); }
 
 stage.addEventListener("pointerdown",e=>{
   if(document.getElementById("cardWrap").classList.contains("on")) return;
-  down=true; moved=false; mode="drag"; vX=vY=0;
+  down=true; moved=false; vX=vY=0;
+  if(rotatable()){ mode="drag"; stage.classList.add("grab"); }
   lx=e.clientX; ly=e.clientY; lt=performance.now();
-  stage.classList.add("grab");
   pid=e.pointerId;
 });
 let pid=null;
 stage.addEventListener("pointermove",e=>{
   if(!down) return;
   const dx=e.clientX-lx, dy=e.clientY-ly;
-  if(!moved && Math.hypot(dx,dy)>7){ moved=true; try{ stage.setPointerCapture(pid); }catch(_){} }
-  if(moved){
+  if(!moved && Math.hypot(dx,dy)>7){ moved=true; if(rotatable()){ try{ stage.setPointerCapture(pid); }catch(_){} } }
+  if(moved && rotatable()){
     const k=0.45;
-    rotY+=dx*k; rotX-=dy*k;
-    rotX=Math.max(-98,Math.min(98,rotX));
+    rotY+=dx*k;
+    if(shape==="cube"){ rotX-=dy*k; rotX=Math.max(-98,Math.min(98,rotX)); }
     const now=performance.now(), dt=Math.max(1,now-lt);
-    vY=dx*k*(16/dt); vX=-dy*k*(16/dt);      /* velocity normalised to ~60fps frames */
+    vY=dx*k*(16/dt); vX=shape==="cube"?-dy*k*(16/dt):0;   /* velocity normalised to ~60fps frames */
     lx=e.clientX; ly=e.clientY; lt=now;
     paint(); updateDots();
     document.getElementById("hint").classList.add("fade");
@@ -449,7 +487,7 @@ stage.addEventListener("pointermove",e=>{
 function endDrag(){
   if(!down) return;
   down=false; stage.classList.remove("grab");
-  if(!moved){ mode="rest"; return; }        /* it was a tap; face click handlers fire */
+  if(!moved || !rotatable()){ mode="rest"; return; }   /* tap, or a flat panel: face click handlers fire */
   if(REDUCED){ nearestTarget(); rotX=tX; rotY=tY; mode="rest"; paint(); updateDots(); return; }
   const speed=Math.hypot(vX,vY);
   if(speed>0.5){ mode="inertia"; } else { nearestTarget(); mode="snap"; }
@@ -461,15 +499,23 @@ stage.addEventListener("pointercancel",endDrag);
 /* keyboard: arrows turn one face */
 window.addEventListener("keydown",e=>{
   if(document.getElementById("cardWrap").classList.contains("on")){ if(e.key==="Escape") closeCard(); return; }
-  const step={ArrowLeft:[0,90],ArrowRight:[0,-90],ArrowUp:[90,0],ArrowDown:[-90,0]}[e.key];
+  if(!rotatable()) return;
+  const s=snapStepY();
+  const step={ArrowLeft:[0,s],ArrowRight:[0,-s],ArrowUp:[90,0],ArrowDown:[-90,0]}[e.key];
   if(!step) return;
-  nearestTarget(); tX=Math.max(-90,Math.min(90,tX+step[0])); tY+=step[1];
+  if(shape!=="cube" && step[0]!==0) return;   /* single-axis shapes ignore up/down */
+  nearestTarget();
+  if(shape==="cube") tX=Math.max(-90,Math.min(90,tX+step[0]));
+  tY+=step[1];
   mode="snap"; run();
 });
 
 /* ---------- boot ---------- */
 sizeCube(); paint();
-let rz; window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>{ sizeCube(); paint(); },120); });
+let rz; window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>{
+  sizeCube();
+  if(level==="family") openFamily(curFam); else paint();
+},120); });
 </script>
 </body>
 </html>
