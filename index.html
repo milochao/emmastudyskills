@@ -14,7 +14,8 @@
     --dark:#3a3733;
     --ui:'Inter',system-ui,-apple-system,sans-serif;
     --serif:'Instrument Serif',Georgia,serif;
-    --edge:rgba(0,0,0,.30);
+    --edge:rgba(0,0,0,.22);
+    --hairline:rgba(0,0,0,.14);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -24,7 +25,7 @@
 
   header{width:100%; max-width:1000px; padding:calc(12px + env(safe-area-inset-top)) 20px 4px; display:flex; align-items:baseline; justify-content:space-between; gap:10px; z-index:20}
   .brand{font-family:var(--serif); font-size:21px; letter-spacing:.04em}
-  .brand b{font-weight:400} .brand .d{color:#ffc34c}
+  .brand b{font-weight:400} .brand .d{color:#b8863b}
   .ctx{font-size:12.5px; color:var(--dim); text-align:right}
 
   #stage{flex:1; width:100%; display:flex; align-items:center; justify-content:center;
@@ -37,33 +38,33 @@
   .cube{position:relative; width:var(--sz); height:var(--sz); transform-style:preserve-3d; will-change:transform}
   .cube.hide{display:none}
   .face{position:absolute; width:var(--sz); height:var(--sz); backface-visibility:hidden; -webkit-backface-visibility:hidden;
-    border-radius:.75em; box-shadow:inset 0 0 0 2px var(--edge)}
+    border-radius:.6em; box-shadow:inset 0 0 0 1px var(--edge)}
 
   /* family face (level 1) */
-  .fam{cursor:pointer; padding:1.35em; display:flex; flex-direction:column; justify-content:space-between}
-  .fam .fnum{font-size:.69em; font-weight:700; letter-spacing:.12em; text-transform:uppercase; opacity:.6}
-  .fam .fnm{font-family:var(--serif); font-size:2.4em; line-height:1.0; margin:.15em 0 .2em}
-  .fam .fbl{font-size:.84em; line-height:1.4; opacity:.92}
-  .fam .fopen{font-size:.75em; font-weight:700; letter-spacing:.06em; opacity:.8; margin-top:.8em}
+  .fam{cursor:pointer; padding:1.45em; display:flex; flex-direction:column; justify-content:space-between}
+  .fam .fnum{font-size:.66em; font-weight:600; letter-spacing:.16em; text-transform:uppercase; opacity:.65}
+  .fam .fnm{font-family:var(--serif); font-size:2.4em; line-height:1.0; margin:.18em 0 .24em}
+  .fam .fbl{font-size:.84em; line-height:1.45; opacity:.88; font-weight:400}
+  .fam .fopen{font-size:.66em; font-weight:600; letter-spacing:.14em; text-transform:uppercase; opacity:.7; margin-top:.8em}
 
   /* technique tiles (level 2) */
-  .tgrid{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:.5em; padding:.5em; width:100%; height:100%}
-  .cell{border:none; border-radius:.5em; cursor:pointer; font-family:var(--ui); font-weight:600; font-size:.78em;
-    line-height:1.15; padding:.75em; display:flex; align-items:flex-end; text-align:left; box-shadow:inset 0 0 0 1.5px var(--edge);
+  .tgrid{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:.45em; padding:.45em; width:100%; height:100%}
+  .cell{border:none; border-radius:.4em; cursor:pointer; font-family:var(--ui); font-weight:500; font-size:.8em;
+    line-height:1.2; padding:.75em; display:flex; align-items:flex-end; text-align:left;
+    box-shadow:inset 0 0 0 1px var(--hairline);
     position:relative; overflow:hidden}
-  @media (hover:hover){ .cell:hover{filter:brightness(1.07)} }
-  .cell .ic{position:absolute; top:.65em; left:.65em; width:1.6em; height:1.6em; opacity:.92; display:block}
-  .cell .ic svg{width:100%; height:100%}
-  .startface{box-shadow:inset 0 0 0 3px rgba(255,255,255,.92)}
-  .fam.startface{padding-top:2.7em}
-  .startpill{position:absolute; top:.75em; left:50%; transform:translateX(-50%); z-index:3;
-    display:inline-flex; align-items:center; gap:.5em; padding:.4em .9em; border-radius:999px;
-    background:#293132; color:#fff; font-family:var(--ui); font-weight:800; font-size:.69em; letter-spacing:.13em; white-space:nowrap}
-  .startpill .pdot{width:.55em; height:.55em; border-radius:50%; background:#61c470}
-  .startcell{box-shadow:inset 0 0 0 3px rgba(255,255,255,.95)}
-  .stag{position:absolute; top:.6em; right:.6em; z-index:3; padding:.3em .7em; border-radius:999px;
-    background:#293132; color:#fff; font-family:var(--ui); font-weight:800; font-size:.72em; letter-spacing:.09em; white-space:nowrap}
-  .cell.empty{opacity:.16; pointer-events:none; box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.18)}
+  @media (hover:hover){ .cell:hover{filter:brightness(1.05)} }
+  .cell .ic{position:absolute; top:.7em; left:.7em; width:1.5em; height:1.5em; opacity:.72; display:block}
+  .cell .ic svg{width:100%; height:100%; stroke-width:1.7}
+  .startface{box-shadow:inset 0 0 0 1px var(--edge), inset 0 0 0 3px rgba(255,255,255,.35)}
+  .startpill{position:absolute; bottom:1.35em; right:1.45em; z-index:3;
+    padding:.45em .85em; border-radius:3px;
+    background:rgba(24,23,21,.82); color:#f1eee6; font-family:var(--ui); font-weight:600; font-size:.6em; letter-spacing:.18em; text-transform:uppercase; white-space:nowrap}
+  .startcell{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7)}
+  .stag{position:absolute; top:.75em; right:.75em; z-index:3; padding:.35em .65em; border-radius:3px;
+    background:rgba(24,23,21,.82); color:#f1eee6; font-family:var(--ui); font-weight:600; font-size:.62em; letter-spacing:.16em; text-transform:uppercase; white-space:nowrap}
+  .cell.empty{pointer-events:none; background:transparent !important;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.09)}
 
   .hint{position:absolute; bottom:calc(64px + env(safe-area-inset-bottom)); left:0; right:0; text-align:center;
     font-size:12.5px; color:var(--faint); z-index:5; pointer-events:none; transition:opacity .5s}
@@ -81,10 +82,14 @@
   @media (hover:hover){ .back:hover{background:rgba(0,0,0,.09)} }
 
   /* flat panel for families of 6 or fewer: everything visible, no spin */
-  .panel{position:relative; border-radius:.75em; padding:.5em; box-shadow:inset 0 0 0 2px var(--edge)}
+  .panel{position:relative; border-radius:.6em; padding:.45em; box-shadow:inset 0 0 0 1px var(--edge)}
   .panel.hide{display:none}
-  .pgrid{display:grid; grid-template-columns:1fr 1fr; gap:.5em}
+  .pgrid{display:grid; grid-template-columns:1fr 1fr; gap:.45em}
   .pgrid .cell{height:10.5em}
+
+  /* soft ground shadow so the shape reads as an object in light */
+  .ground{position:absolute; left:50%; transform:translateX(-50%); pointer-events:none;
+    background:radial-gradient(50% 50% at 50% 50%, rgba(35,32,28,.20), rgba(35,32,28,0) 72%)}
 
   /* face pager dots */
   .dots{position:absolute; bottom:calc(40px + env(safe-area-inset-bottom)); left:0; right:0; display:flex; gap:7px; justify-content:center; z-index:5; pointer-events:none}
@@ -96,26 +101,28 @@
   #cardWrap{position:fixed; inset:0; z-index:40; display:none; align-items:center; justify-content:center;
     background:rgba(238,235,228,.6); backdrop-filter:blur(4px); padding:18px}
   #cardWrap.on{display:flex}
-  .card{--c:#5c99e2; --cs:#3b76c0;
+  .card{--c:#4a5fa5; --cs:#37477c;
     position:relative; width:22em; max-width:min(340px, calc(100vw - 36px)); max-height:min(88vh, calc(100dvh - 36px)); overflow:auto;
     -webkit-overflow-scrolling:touch; overscroll-behavior:contain; touch-action:pan-y;
-    background:#f5f1e8; border-radius:1.4em; padding:1.3em; border:.16em solid var(--dark); box-shadow:.55em .55em 0 var(--dark);
-    display:flex; flex-direction:column; animation:pop .28s cubic-bezier(.34,1.56,.64,1)}
-  @keyframes pop{from{transform:scale(.9) translateY(8px); opacity:0}to{transform:none; opacity:1}}
+    background:#fdfcf8; border-radius:12px; padding:1.5em 1.5em 1.3em;
+    border:1px solid rgba(0,0,0,.10); border-top:3px solid var(--c);
+    box-shadow:0 24px 60px -12px rgba(30,28,24,.28), 0 4px 14px rgba(30,28,24,.10);
+    display:flex; flex-direction:column; animation:pop .24s cubic-bezier(.3,1,.4,1)}
+  @keyframes pop{from{transform:scale(.96) translateY(10px); opacity:0}to{transform:none; opacity:1}}
   @media (prefers-reduced-motion:reduce){ .card{animation:none} }
   .card::-webkit-scrollbar{width:0}
-  .c-head{display:flex; align-items:center; margin-bottom:.9em}
-  .c-av{width:3.1em; height:3.1em; border-radius:50%; background:var(--c); border:.16em solid var(--dark); box-shadow:.18em .18em 0 var(--dark); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.3em; color:#fff}
-  .c-nm{margin-left:.7em; font-size:1.35em; font-weight:800; color:var(--dark); line-height:1.05}
-  .c-badge{align-self:flex-start; font-size:.7em; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#fff; background:var(--c); border:.14em solid var(--dark); border-radius:1em; padding:.35em .8em; margin-bottom:.9em}
-  .c-band{height:.6em; border-radius:.4em; background:var(--c); border:.14em solid var(--dark); margin-bottom:1em}
-  .c-lab{font-size:.66em; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--cs); margin:.2em 0 .3em}
-  .c-txt{font-size:.92em; line-height:1.42; color:var(--dark); font-weight:600; margin-bottom:1em}
-  .c-src{font-size:.8em; line-height:1.4; color:#7c766c; font-style:italic; font-weight:600; margin-top:.2em}
-  .c-btn{margin-top:1.2em; align-self:stretch; background:var(--c); border:.16em solid var(--dark); border-radius:.9em; padding:.7em; cursor:pointer;
-    font-family:var(--ui); font-weight:800; font-size:1em; color:#fff; letter-spacing:.02em;
-    box-shadow:0 .22em 0 var(--cs), 0 .42em 0 var(--dark); transition:transform .1s, box-shadow .1s}
-  .c-btn:active{transform:translateY(.22em); box-shadow:0 0 0 var(--cs), 0 .22em 0 var(--dark)}
+  .c-head{display:flex; align-items:center; margin-bottom:1em}
+  .c-av{width:2.8em; height:2.8em; border-radius:8px; background:color-mix(in srgb, var(--c) 14%, #fdfcf8); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--c)}
+  .c-nm{margin-left:.8em; font-family:var(--serif); font-size:1.6em; font-weight:400; color:var(--ink); line-height:1.02}
+  .c-badge{align-self:flex-start; font-size:.62em; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--cs); background:color-mix(in srgb, var(--c) 10%, transparent); border-radius:3px; padding:.45em .8em; margin-bottom:1.1em}
+  .c-band{height:1px; background:rgba(0,0,0,.10); margin-bottom:1.1em}
+  .c-lab{font-size:.62em; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--cs); margin:.2em 0 .35em}
+  .c-txt{font-size:.9em; line-height:1.55; color:var(--ink); font-weight:400; margin-bottom:1.1em}
+  .c-src{font-size:.78em; line-height:1.5; color:#8b857a; font-style:italic; font-weight:400; margin-top:.2em}
+  .c-btn{margin-top:1.3em; align-self:stretch; background:var(--c); border:none; border-radius:8px; padding:.75em; cursor:pointer;
+    font-family:var(--ui); font-weight:600; font-size:.92em; color:#fdfcf8; letter-spacing:.03em;
+    transition:background .12s, transform .08s}
+  .c-btn:active{transform:translateY(1px); background:var(--cs)}
 </style>
 </head>
 <body>
@@ -126,6 +133,7 @@
   </header>
   <button class="back" id="back">&larr; Back</button>
   <div id="stage">
+    <div class="ground" id="ground"></div>
     <div class="cube" id="cubeF"></div>
     <div class="cube hide" id="cubeT"></div>
     <div class="panel hide" id="panelEl"></div>
@@ -150,12 +158,12 @@ const shade = (hex,f)=>{ let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(
 
 /* families: index -> face of level-1 cube (0 front,1 right,2 left,3 top,4 bottom,5 back) */
 const FAM=[
-  {n:"Learn It",    c:"#477cfb", bl:"New material, start to finish. Guess, take a swing before you've studied, turn it into a picture, pull it back cold."},
-  {n:"Keep It",     c:"#61c470", bl:"Bring old material back after a gap so it sticks. Guess, space it, review, out."},
-  {n:"Exam",        c:"#e85151", bl:"Get ready for a test. Mix the types, hard-start the hard one, learn from the postmortem."},
-  {n:"Unstuck",     c:"#ffc34c", bl:"When you can't start or you stall. It runs from the door to Guess First, where the learning lines begin."},
-  {n:"Why It Works",c:"#8a5bd6", bl:"The physics under the network. Not stations, the reasons the routes run the way they do."},
-  {n:"Not On The Map", c:"#8a8f98", bl:"Feels like studying, isn't. Do the move named on each one instead."},
+  {n:"Learn It",    c:"#4a5fa5", bl:"New material, start to finish. Guess, take a swing before you've studied, turn it into a picture, pull it back cold."},
+  {n:"Keep It",     c:"#4e7d5b", bl:"Bring old material back after a gap so it sticks. Guess, space it, review, out."},
+  {n:"Exam",        c:"#a35248", bl:"Get ready for a test. Mix the types, hard-start the hard one, learn from the postmortem."},
+  {n:"Unstuck",     c:"#b8863b", bl:"When you can't start or you stall. It runs from the door to Guess First, where the learning lines begin."},
+  {n:"Why It Works",c:"#6d5a94", bl:"The physics under the network. Not stations, the reasons the routes run the way they do."},
+  {n:"Not On The Map", c:"#75787c", bl:"Feels like studying, isn't. Do the move named on each one instead."},
 ];
 
 /* every technique. fam = family indices it belongs to. content pulled from the app. */
@@ -293,7 +301,7 @@ FAM.forEach((fam,ci)=>{
   const face=document.createElement("div"); face.className="face fam"+(ci===0?" startface":"");
   face.style.background=fam.c; face.style.color=inkFor(fam.c);
   const count=T.filter(t=>t.fam.includes(ci)).length;
-  const startPill=ci===0?`<div class="startpill"><span class="pdot"></span>START HERE</div>`:"";
+  const startPill=ci===0?`<div class="startpill">Start here</div>`:"";
   face.innerHTML=`${startPill}<div><div class="fnum">Family ${ci+1} · ${count} techniques</div>
     <div class="fnm">${fam.n}</div><div class="fbl">${fam.bl}</div></div>
     <div class="fopen">Tap to open &rarr;</div>`;
@@ -374,7 +382,7 @@ function openFamily(ci){
   document.getElementById("hint").classList.remove("fade");
   setBack(`&larr; All families`); document.getElementById("ctx").textContent=`${fam.n} · ${items.length}`;
   setRotation(0,0);
-  updateDots();
+  updateDots(); placeGround();
 }
 
 /* ---------- level-3 (card) ---------- */
@@ -414,7 +422,7 @@ backBtn.addEventListener("click",()=>{
     document.getElementById("ctx").textContent="All 47 · six families";
     backBtn.classList.remove("on");
     setRotation(-18,-28);      /* rest at the hero angle; snapping resumes after the next drag */
-    updateDots();
+    updateDots(); placeGround();
   }
 });
 
@@ -428,6 +436,16 @@ let mode="rest";                 /* rest | drag | inertia | snap */
 let tX=0, tY=0;                  /* snap target */
 let rafId=null;
 
+const groundEl=document.getElementById("ground");
+function placeGround(){
+  const el=level==="family"?(shape==="panel"?panelEl:cubeT):cubeF;
+  requestAnimationFrame(()=>{
+    const sr=stage.getBoundingClientRect(), er=el.getBoundingClientRect();
+    groundEl.style.width=(er.width*0.92)+"px";
+    groundEl.style.height=Math.max(16, er.width*0.10)+"px";
+    groundEl.style.top=(er.bottom - sr.top + er.width*0.02)+"px";
+  });
+}
 function rotatable(){ return !(level==="family" && shape==="panel"); }
 function paint(){
   if(!rotatable()) return;
@@ -511,10 +529,10 @@ window.addEventListener("keydown",e=>{
 });
 
 /* ---------- boot ---------- */
-sizeCube(); paint();
+sizeCube(); paint(); placeGround();
 let rz; window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>{
   sizeCube();
-  if(level==="family") openFamily(curFam); else paint();
+  if(level==="family") openFamily(curFam); else { paint(); placeGround(); }
 },120); });
 </script>
 </body>
