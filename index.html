@@ -3,1257 +3,473 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#FFFFFF">
-<title>MOVE</title>
+<meta name="theme-color" content="#f1eee6">
+<title>MOVE · All the techniques</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FFFFFF; --surface:#F6F7F9; --surface-2:#EDEFF3;
-    --line:rgba(0,0,0,.10); --line-2:rgba(0,0,0,.16);
-    --ink:#1A1D23; --ink-dim:#565C68; --ink-faint:#8A909C;
-    --now:#4F46E5; --guess:#64748B; --got:#4F46E5; --good:#3F8452;
-    --display:'Instrument Serif',Georgia,'Times New Roman',serif;
+    --bg:#f1eee6; --ink:#2c2b28; --dim:#5f636b; --faint:#767b82;
+    --dark:#3a3733;
     --ui:'Inter',system-ui,-apple-system,sans-serif;
-    --maxw:480px;
+    --serif:'Instrument Serif',Georgia,serif;
+    --edge:rgba(0,0,0,.30);
   }
-  *{box-sizing:border-box; margin:0; padding:0}
+  *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
-  body{
-    background:var(--bg); color:var(--ink); font-family:var(--ui);
-    font-weight:450; line-height:1.5; -webkit-font-smoothing:antialiased;
-    font-size:16px; overflow-x:hidden;
-  }
-  #app{min-height:100dvh; max-width:var(--maxw); margin:0 auto; padding:0 22px;
-    display:flex; flex-direction:column; position:relative}
-  .scr{flex:1; display:flex; flex-direction:column; padding:26px 0 40px; animation:rise .42s cubic-bezier(.2,.7,.2,1)}
-  @keyframes rise{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
-  @media (prefers-reduced-motion:reduce){.scr{animation:none} *{transition:none!important}}
+  body{background:radial-gradient(120% 100% at 50% 0%, #fbfaf6 0%, var(--bg) 60%); color:var(--ink);
+    font-family:var(--ui); overflow:hidden; -webkit-font-smoothing:antialiased; user-select:none; -webkit-user-select:none}
+  #wrap{height:100dvh; display:flex; flex-direction:column; align-items:center; position:relative}
 
-  /* top bar */
-  .top{display:flex; align-items:center; justify-content:space-between; padding:18px 0 0; min-height:38px}
-  .brand{font-family:var(--display); font-size:25px; letter-spacing:.06em}
-  .brand .dot{color:var(--now)}
-  .chip{font-size:13px; color:var(--ink-dim); background:var(--surface); border:1px solid var(--line);
-    border-radius:100px; padding:6px 13px; cursor:pointer; font-weight:500}
-  .chip:hover{border-color:var(--line-2)}
+  header{width:100%; max-width:1000px; padding:calc(12px + env(safe-area-inset-top)) 20px 4px; display:flex; align-items:baseline; justify-content:space-between; gap:10px; z-index:20}
+  .brand{font-family:var(--serif); font-size:21px; letter-spacing:.04em}
+  .brand b{font-weight:400} .brand .d{color:#ffc34c}
+  .ctx{font-size:12.5px; color:var(--dim); text-align:right}
 
-  /* type */
-  .eyebrow{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); font-weight:600}
-  .display{font-family:var(--display); font-weight:400; line-height:1.08; letter-spacing:.01em}
-  h1.display{font-size:46px}
-  .prompt{font-family:var(--display); font-size:33px; line-height:1.16; font-weight:400}
-  .lede{color:var(--ink-dim); font-size:15.5px; max-width:36ch}
-  .muted{color:var(--ink-dim)} .faint{color:var(--ink-faint)}
-  .spacer{flex:1}
+  #stage{flex:1; width:100%; display:flex; align-items:center; justify-content:center;
+    padding-bottom:64px;
+    perspective:1300px; perspective-origin:50% 42%; cursor:grab; position:relative;
+    touch-action:none}
+  #stage.grab{cursor:grabbing}
 
-  /* buttons */
-  .btn{font-family:var(--ui); font-weight:600; font-size:16px; border:none; border-radius:14px;
-    padding:16px 20px; cursor:pointer; width:100%; transition:transform .12s, background .2s, border-color .2s;
-    display:flex; align-items:center; justify-content:center; gap:9px}
-  .btn:active{transform:scale(.985)}
-  .btn-primary{background:var(--now); color:#fff}
-  .btn-primary:hover{background:#4338CA}
-  .btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--line-2)}
-  .btn-ghost:hover{border-color:var(--ink-dim)}
-  .btn-quiet{background:var(--surface); color:var(--ink-dim); border:1px solid var(--line)}
-  .btn-quiet:hover{color:var(--ink)}
-  .btn-sm{padding:11px 15px; font-size:14px; width:auto; border-radius:11px}
-  .row{display:flex; gap:11px}
-  .linklist{display:flex; gap:20px; margin-top:6px}
-  .tlink{background:none; border:none; color:var(--ink-faint); font:inherit; font-size:14px;
-    font-weight:500; cursor:pointer; padding:6px 0}
-  .tlink:hover{color:var(--ink-dim)}
+  /* geometry in px is set by JS via --sz; type inside faces is em, scaled off the cube's font-size */
+  .cube{position:relative; width:var(--sz); height:var(--sz); transform-style:preserve-3d; will-change:transform}
+  .cube.hide{display:none}
+  .face{position:absolute; width:var(--sz); height:var(--sz); backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border-radius:.75em; box-shadow:inset 0 0 0 2px var(--edge)}
 
-  /* inputs */
-  textarea,input[type=text]{width:100%; background:var(--surface); border:1px solid var(--line);
-    color:var(--ink); font-family:var(--ui); font-size:16px; border-radius:13px; padding:14px;
-    resize:none; line-height:1.5}
-  textarea:focus,input:focus{outline:none; border-color:var(--now)}
-  textarea{min-height:120px}
-  ::placeholder{color:var(--ink-faint)}
-  .field-lab{font-size:13px; color:var(--ink-dim); margin-bottom:8px; font-weight:500}
+  /* family face (level 1) */
+  .fam{cursor:pointer; padding:1.35em; display:flex; flex-direction:column; justify-content:space-between}
+  .fam .fnum{font-size:.69em; font-weight:700; letter-spacing:.12em; text-transform:uppercase; opacity:.6}
+  .fam .fnm{font-family:var(--serif); font-size:2.4em; line-height:1.0; margin:.15em 0 .2em}
+  .fam .fbl{font-size:.84em; line-height:1.4; opacity:.92}
+  .fam .fopen{font-size:.75em; font-weight:700; letter-spacing:.06em; opacity:.8; margin-top:.8em}
 
-  /* the bet */
-  .betbox{display:flex; flex-direction:column; align-items:center; gap:18px; margin:8px 0}
-  .stepper{display:flex; align-items:center; gap:0; background:var(--surface); border:1px solid var(--line-2);
-    border-radius:18px; overflow:hidden}
-  .stepper button{background:none; border:none; color:var(--ink); width:62px; height:74px;
-    font-size:28px; cursor:pointer; font-family:var(--ui); font-weight:300}
-  .stepper button:hover{background:var(--surface-2)}
-  .stepper .val{min-width:84px; text-align:center; font-family:var(--display); font-size:52px; color:var(--now)}
-  .scale{display:flex; gap:10px}
-  .scale button{width:54px; height:60px; border-radius:14px; background:var(--surface);
-    border:1px solid var(--line); color:var(--ink-dim); font-size:20px; font-family:var(--display); cursor:pointer; transition:.15s}
-  .scale button:hover{border-color:var(--line-2); color:var(--ink)}
-  .scale button[aria-pressed=true]{background:var(--now); color:#fff; border-color:var(--now)}
-  .scale-ends{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-faint); margin-top:7px}
+  /* technique tiles (level 2) */
+  .tgrid{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:.5em; padding:.5em; width:100%; height:100%}
+  .cell{border:none; border-radius:.5em; cursor:pointer; font-family:var(--ui); font-weight:600; font-size:.78em;
+    line-height:1.15; padding:.75em; display:flex; align-items:flex-end; text-align:left; box-shadow:inset 0 0 0 1.5px var(--edge);
+    position:relative; overflow:hidden}
+  @media (hover:hover){ .cell:hover{filter:brightness(1.07)} }
+  .cell .ic{position:absolute; top:.65em; left:.65em; width:1.6em; height:1.6em; opacity:.92; display:block}
+  .cell .ic svg{width:100%; height:100%}
+  .startface{box-shadow:inset 0 0 0 3px rgba(255,255,255,.92)}
+  .fam.startface{padding-top:2.7em}
+  .startpill{position:absolute; top:.75em; left:50%; transform:translateX(-50%); z-index:3;
+    display:inline-flex; align-items:center; gap:.5em; padding:.4em .9em; border-radius:999px;
+    background:#293132; color:#fff; font-family:var(--ui); font-weight:800; font-size:.69em; letter-spacing:.13em; white-space:nowrap}
+  .startpill .pdot{width:.55em; height:.55em; border-radius:50%; background:#61c470}
+  .startcell{box-shadow:inset 0 0 0 3px rgba(255,255,255,.95)}
+  .stag{position:absolute; top:.6em; right:.6em; z-index:3; padding:.3em .7em; border-radius:999px;
+    background:#293132; color:#fff; font-family:var(--ui); font-weight:800; font-size:.72em; letter-spacing:.09em; white-space:nowrap}
+  .cell.empty{opacity:.16; pointer-events:none; box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.18)}
 
-  /* ring */
-  .ringwrap{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; flex:1}
-  .ring{position:relative; width:248px; height:248px}
-  .ring svg{transform:rotate(-90deg)}
-  .ring .track{fill:none; stroke:var(--line); stroke-width:6}
-  .ring .arc{fill:none; stroke:var(--now); stroke-width:6; stroke-linecap:round; transition:stroke .3s}
-  .ring .mid{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px}
-  .ring .time{font-family:var(--display); font-size:44px; letter-spacing:.02em}
-  .ring .midlab{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:600}
+  .hint{position:absolute; bottom:calc(64px + env(safe-area-inset-bottom)); left:0; right:0; text-align:center;
+    font-size:12.5px; color:var(--faint); z-index:5; pointer-events:none; transition:opacity .5s}
+  .hint.fade{opacity:0}
+  .legend{position:absolute; bottom:calc(14px + env(safe-area-inset-bottom)); left:0; right:0;
+    display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:center; padding:0 18px; z-index:5}
+  .legend.hide{display:none}
+  .lg{display:flex; align-items:center; gap:6px; font-size:11px; color:var(--dim)}
+  .sw{width:10px; height:10px; border-radius:3px; box-shadow:inset 0 0 0 1px var(--edge)}
 
-  /* chips / coverage */
-  .chips{display:flex; flex-wrap:wrap; gap:9px; margin:4px 0}
-  .cov{background:var(--surface); border:1px solid var(--line); color:var(--ink-dim);
-    border-radius:11px; padding:11px 13px; cursor:pointer; font-size:14.5px; transition:.15s; text-align:left; line-height:1.35}
-  .cov:hover{border-color:var(--line-2)}
-  .cov[aria-pressed=true]{background:rgba(79,70,229,.10); border-color:var(--now); color:var(--ink)}
-  .cov[aria-pressed=true]::before{content:"✓ "; color:var(--now); font-weight:700}
+  .back{position:absolute; top:calc(50px + env(safe-area-inset-top)); left:16px; z-index:16; display:none; align-items:center; gap:8px;
+    background:rgba(0,0,0,.05); border:1px solid rgba(0,0,0,.12); color:var(--ink);
+    border-radius:22px; padding:9px 15px; font-size:13.5px; font-weight:600; cursor:pointer}
+  .back.on{display:inline-flex}
+  @media (hover:hover){ .back:hover{background:rgba(0,0,0,.09)} }
 
-  /* q/a step */
-  .qcard{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px; margin:6px 0}
-  .qnum{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; margin-bottom:11px}
-  .qtext{font-family:var(--display); font-size:25px; line-height:1.2}
-  .answer{margin-top:16px; padding-top:16px; border-top:1px solid var(--line); color:var(--good); font-size:16px}
-  .answer .alab{font-size:12px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.12em; display:block; margin-bottom:5px; font-weight:600}
+  /* face pager dots */
+  .dots{position:absolute; bottom:calc(40px + env(safe-area-inset-bottom)); left:0; right:0; display:flex; gap:7px; justify-content:center; z-index:5; pointer-events:none}
+  .dots.hide{display:none}
+  .dot{width:6px; height:6px; border-radius:50%; background:rgba(0,0,0,.18); transition:background .2s, transform .2s}
+  .dot.on{background:var(--ink); transform:scale(1.25)}
 
-  /* gap viz (signature) */
-  .gap{margin:14px 0 6px}
-  .gaptrack{position:relative; height:3px; background:var(--line); border-radius:3px; margin:54px 8px 16px}
-  .pin{position:absolute; top:50%; width:15px; height:15px; border-radius:50%; transform:translate(-50%,-50%); transition:left .7s cubic-bezier(.2,.7,.2,1)}
-  .pin.g{background:var(--guess); box-shadow:0 0 0 4px rgba(100,116,139,.16)}
-  .pin.r{background:var(--got); box-shadow:0 0 0 4px rgba(79,70,229,.15)}
-  .pinlab{position:absolute; font-size:11px; letter-spacing:.04em; transform:translateX(-50%); white-space:nowrap; font-weight:600}
-  .pinlab.g{top:-30px; color:var(--guess)} .pinlab.r{bottom:-26px; color:var(--got)}
-  .gapnum{font-family:var(--display); font-size:15px}
-
-  /* meter / trend */
-  .stat{display:flex; align-items:baseline; gap:10px}
-  .statbig{font-family:var(--display); font-size:40px; color:var(--now)}
-  .sub{font-size:14px; color:var(--ink-dim)}
-  .spark{display:flex; align-items:flex-end; gap:5px; height:46px; margin:10px 0}
-  .spark .bar{flex:1; background:var(--surface-2); border-radius:3px 3px 0 0; min-height:4px; transition:height .4s}
-  .spark .bar.last{background:var(--now)}
-
-  /* list rows (library / parent) */
-  .rowcard{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 17px; margin-bottom:11px}
-  .rowcard .rt{font-family:var(--display); font-size:22px; line-height:1.1}
-  .rowcard .rd{color:var(--ink-dim); font-size:14px; margin-top:6px; line-height:1.45}
-  .rowhead{display:flex; align-items:center; justify-content:space-between; gap:12px}
-  .tag{font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:600; padding:4px 9px; border-radius:7px}
-  .tag.active{color:var(--now); background:rgba(227,165,81,.12)}
-  .tag.grad{color:var(--good); background:rgba(143,185,150,.12)}
-  .tag.dud{color:var(--ink-faint); background:rgba(0,0,0,.04)}
-  details.rowcard summary{list-style:none; cursor:pointer; outline:none}
-  details.rowcard summary::-webkit-details-marker{display:none}
-  details[open] .rd{margin-top:10px}
-  .section-lab{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; margin:26px 0 13px}
-  .note{font-size:13.5px; color:var(--ink-faint); line-height:1.5; border-left:2px solid var(--line-2); padding-left:13px; margin:4px 0 8px}
-
-  .mic{background:var(--surface); border:1px solid var(--line-2); color:var(--ink-dim); border-radius:11px;
-    padding:11px 14px; font:inherit; font-size:14px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:8px}
-  .mic[aria-pressed=true]{color:var(--now); border-color:var(--now)}
-  .mic .pulse{width:8px; height:8px; border-radius:50%; background:currentColor}
-  .mic[aria-pressed=true] .pulse{animation:pulse 1s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-  .toast{position:fixed; left:50%; bottom:30px; transform:translateX(-50%) translateY(20px); opacity:0;
-    background:var(--surface-2); border:1px solid var(--line-2); color:var(--ink); padding:13px 18px;
-    border-radius:12px; font-size:14px; pointer-events:none; transition:.3s; z-index:50; max-width:90vw; box-shadow:0 10px 34px rgba(0,0,0,.13)}
-  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
-
-  .celebrate{text-align:center; padding:30px 0}
-  .celebrate .big{font-family:var(--display); font-size:40px; color:var(--good); line-height:1.1}
-
-  .pgrid{display:flex; flex-direction:column; gap:8px; margin-top:10px}
-  .ptt{font-size:12px; color:var(--ink-faint); letter-spacing:.08em; text-transform:uppercase; font-weight:600}
-  hr.div{border:none; border-top:1px solid var(--line); margin:22px 0}
-  /* ---- Library board: relational color (Albers), 3-hue discipline (Vignelli), fills canvas (Hara) ---- */
-  #app.wide{max-width:1060px}
-  .boardhead{margin-top:24px}
-  .boardhead .note{max-width:560px}
-  .board{margin-top:24px; display:flex; flex-direction:column; gap:18px}
-  .kitgrid{display:grid; grid-template-columns:1fr; gap:18px; align-items:start}
-  @media(min-width:780px){ .kitgrid{grid-template-columns:1fr 1fr} }
-
-  .zone{border-radius:16px; padding:18px 20px; border:1px solid var(--line); background:var(--surface)}
-  .ztitle{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:14px}
-  .ztitle .zhead{display:flex; align-items:baseline; gap:9px; min-width:0}
-  .znum{font-family:var(--ui); font-weight:600; font-size:12px; letter-spacing:.04em; color:var(--ink-faint)}
-  .zname{font-family:var(--ui); font-size:12.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); font-weight:600}
-
-  /* the session flow: entry + exit, warm rail */
-  .zone.flow{border-left:3px solid var(--now); background:linear-gradient(90deg, rgba(227,165,81,.05), rgba(227,165,81,0) 55%)}
-  .zone.flow .zname{color:#4F46E5}
-
-  /* hero: her channel. warmest, most space, biggest type (Scher amplify the hero) */
-  .zone.hero{background:linear-gradient(135deg, rgba(79,70,229,.10), rgba(227,165,81,.035)); border-color:rgba(227,165,81,.36); padding:24px 22px}
-  .zone.hero .ztitle{margin-bottom:4px}
-  .zone.hero .zname{font-family:var(--display); font-size:28px; letter-spacing:0; text-transform:none; color:#4F46E5; font-weight:400}
-  .zone.hero .herosub{font-family:var(--display); font-style:italic; font-size:16px; color:var(--ink-dim); margin-bottom:16px}
-
-  /* foundation: cool, the ground the moves stand on (recedes) */
-  .zone.base{background:linear-gradient(180deg, rgba(127,167,201,.08), rgba(127,167,201,.02)); border-color:rgba(127,167,201,.22)}
-  .zone.base .zname{color:#2E6FA6}
-
-  /* skip: dim, set aside */
-  .zone.skip{background:transparent; border-style:dashed; opacity:.72}
-  .zone.skip .zname{color:var(--ink-faint)}
-
-  .chips2{display:flex; flex-wrap:wrap; gap:9px}
-  .mchip{border-radius:11px; padding:9px 13px; font-size:14px; cursor:pointer; font-family:var(--ui); font-weight:450; text-align:left; color:var(--ink);
-    background:rgba(227,165,81,.06); border:1px solid rgba(227,165,81,.18); transition:border-color .12s, background .12s, transform .04s}
-  .mchip:hover{border-color:rgba(227,165,81,.42)}
-  .mchip:active{transform:translateY(1px)}
-  .mchip[aria-pressed=true]{background:rgba(227,165,81,.2); border-color:var(--now)}
-  .zone.hero .mchip{font-size:15px; padding:11px 15px; background:rgba(227,165,81,.1); border-color:rgba(227,165,81,.32)}
-  .zone.base .mchip{background:rgba(127,167,201,.07); border-color:rgba(127,167,201,.2); font-size:13.5px}
-  .zone.base .mchip:hover{border-color:rgba(127,167,201,.46)}
-  .zone.base .mchip[aria-pressed=true]{background:rgba(127,167,201,.2); border-color:var(--guess)}
-  .zone.skip .mchip{background:rgba(0,0,0,.02); border-color:var(--line); color:var(--ink-dim); border-style:dashed; font-size:13px}
-
-  .zdetail{font-size:14.5px; color:var(--ink-dim); line-height:1.55}
-  .zdetail.show{margin-top:14px}
-  .zone.hero .zdetail.show{font-size:15.5px; color:#D8D3C7}
-  .zdetail .zsrc{display:block; color:var(--ink-faint); font-size:12.5px; margin-top:7px}
-  .ztag{font-size:10px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:4px 9px; border-radius:7px; background:rgba(227,165,81,.18); color:#4F46E5; white-space:nowrap}
-  .zstatus{font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--good); font-weight:600; margin-left:7px}
-
-  /* ---- Front page (position, reason to use, reason to believe) ---- */
-  .fp-claim{font-family:var(--display); font-size:40px; line-height:1.05; letter-spacing:-.01em; margin-top:26px}
-  @media(min-width:780px){ .fp-claim{font-size:52px} }
-  .fp-lede{font-size:17px; color:var(--ink-dim); line-height:1.5; margin-top:16px; max-width:33em}
-  .fp-cta{margin-top:24px; max-width:380px}
-  .fp-sec{margin-top:32px; max-width:39em}
-  .fp-h{font-family:var(--ui); font-size:12px; letter-spacing:.15em; text-transform:uppercase; color:#4F46E5; font-weight:600; margin-bottom:11px}
-  .fp-body{font-size:15.5px; color:var(--ink); line-height:1.62}
-  .fp-body .dim{color:var(--ink-dim)}
-  .proof{margin:18px 0 4px; max-width:430px}
-  .prow{display:flex; align-items:center; gap:12px; margin:8px 0}
-  .prow .plab{width:92px; font-size:13px; color:var(--ink-dim); text-align:right; flex:none}
-  .ptrack{flex:1; height:28px; background:rgba(0,0,0,.05); border-radius:8px; overflow:hidden}
-  .pfill{height:100%; border-radius:8px; display:flex; align-items:center; justify-content:flex-end; padding-right:10px; font-size:12.5px; font-weight:600; min-width:34px}
-  .pfill.dim{background:rgba(0,0,0,.14); color:var(--ink-dim)}
-  .pfill.hot{background:linear-gradient(90deg,#C8893C,#4F46E5); color:#fff}
-  .proofcap{font-size:12px; color:var(--ink-faint); margin-top:9px}
-  .retire{display:inline-block; margin-top:13px; font-family:var(--ui); font-size:13px; font-weight:500; color:var(--good);
-    background:rgba(143,185,150,.1); border:1px solid rgba(143,185,150,.3); border-radius:9px; padding:8px 13px; cursor:pointer}
-  .retire:hover{border-color:rgba(143,185,150,.55)}
-
-  /* ---- Transit map (Library) ---- */
-  .tmap{margin-top:20px; width:100%}
-  .tmap svg{width:100%; height:auto; display:block}
-  .thit{cursor:pointer}
-  .tkey{margin-top:30px}
-  .tkey-h{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); font-weight:600; margin-bottom:14px}
-  .tkey-line{display:flex; gap:12px; align-items:flex-start; margin-bottom:14px; cursor:pointer}
-  .tkey-sw{width:12px; height:12px; border-radius:4px; flex:none; margin-top:4px}
-  .tkey-nm{font-family:var(--ui); font-weight:600; font-size:14.5px; color:var(--ink); margin-bottom:2px}
-  .tkey-ds{font-size:13px; color:var(--ink-dim); line-height:1.5}
-  .tlaws{margin-top:28px}
-  .tlaw-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
-  .tlaw{background:rgba(127,167,201,.07); border:1px solid rgba(127,167,201,.2); color:var(--ink); border-radius:9px; padding:7px 11px; font-size:13px; cursor:pointer; font-family:var(--ui)}
-  .tlaw:hover{border-color:rgba(127,167,201,.45)}
-  .tskip{margin-top:26px}
-  .tskip-h{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; margin-bottom:12px}
-  .tskip-chips{display:flex; flex-wrap:wrap; gap:8px}
-  .tskip .d{background:rgba(0,0,0,.02); border:1px dashed var(--line-2); color:var(--ink-dim); border-radius:9px; padding:7px 11px; font-size:13px; cursor:pointer; font-family:var(--ui)}
-
-  /* station detail: bottom sheet (mobile-first) */
-  .sheet{position:fixed; left:0; right:0; bottom:0; z-index:60; margin:0 auto; max-width:var(--maxw);
-    background:var(--surface); border-top:1px solid var(--line-2); border-radius:18px 18px 0 0;
-    padding:18px 20px calc(26px + env(safe-area-inset-bottom)); box-shadow:0 -16px 44px rgba(0,0,0,.16);
-    transform:translateY(115%); transition:transform .22s cubic-bezier(.2,.7,.2,1)}
-  .sheet.show{transform:translateY(0)}
-  .sheet-top{display:flex; align-items:flex-start; justify-content:space-between; gap:12px}
-  .sheet-nm{font-family:var(--display); font-size:25px; color:var(--ink); line-height:1.08}
-  .sheet-x{flex:none; width:30px; height:30px; border-radius:50%; border:1px solid var(--line-2); background:transparent; color:var(--ink-dim); font-size:15px; cursor:pointer; line-height:1}
-  .sheet-line{font-family:var(--ui); font-size:11.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin-top:5px}
-  .sheet-desc{font-size:15px; color:var(--ink-dim); line-height:1.55; margin-top:13px}
-  .sheet-src{display:block; color:var(--ink-faint); font-size:12.5px; margin-top:9px}
-  .mt-a{margin-top:auto}
-  .mb{margin-bottom:14px} .mb-s{margin-bottom:8px} .mt{margin-top:16px}
-  .center{text-align:center}
+  /* ---- the card (level 3) ---- */
+  #cardWrap{position:fixed; inset:0; z-index:40; display:none; align-items:center; justify-content:center;
+    background:rgba(238,235,228,.6); backdrop-filter:blur(4px); padding:18px}
+  #cardWrap.on{display:flex}
+  .card{--c:#5c99e2; --cs:#3b76c0;
+    position:relative; width:22em; max-width:min(340px, calc(100vw - 36px)); max-height:min(88vh, calc(100dvh - 36px)); overflow:auto;
+    -webkit-overflow-scrolling:touch; overscroll-behavior:contain; touch-action:pan-y;
+    background:#f5f1e8; border-radius:1.4em; padding:1.3em; border:.16em solid var(--dark); box-shadow:.55em .55em 0 var(--dark);
+    display:flex; flex-direction:column; animation:pop .28s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes pop{from{transform:scale(.9) translateY(8px); opacity:0}to{transform:none; opacity:1}}
+  @media (prefers-reduced-motion:reduce){ .card{animation:none} }
+  .card::-webkit-scrollbar{width:0}
+  .c-head{display:flex; align-items:center; margin-bottom:.9em}
+  .c-av{width:3.1em; height:3.1em; border-radius:50%; background:var(--c); border:.16em solid var(--dark); box-shadow:.18em .18em 0 var(--dark); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.3em; color:#fff}
+  .c-nm{margin-left:.7em; font-size:1.35em; font-weight:800; color:var(--dark); line-height:1.05}
+  .c-badge{align-self:flex-start; font-size:.7em; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#fff; background:var(--c); border:.14em solid var(--dark); border-radius:1em; padding:.35em .8em; margin-bottom:.9em}
+  .c-band{height:.6em; border-radius:.4em; background:var(--c); border:.14em solid var(--dark); margin-bottom:1em}
+  .c-lab{font-size:.66em; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--cs); margin:.2em 0 .3em}
+  .c-txt{font-size:.92em; line-height:1.42; color:var(--dark); font-weight:600; margin-bottom:1em}
+  .c-src{font-size:.8em; line-height:1.4; color:#7c766c; font-style:italic; font-weight:600; margin-top:.2em}
+  .c-btn{margin-top:1.2em; align-self:stretch; background:var(--c); border:.16em solid var(--dark); border-radius:.9em; padding:.7em; cursor:pointer;
+    font-family:var(--ui); font-weight:800; font-size:1em; color:#fff; letter-spacing:.02em;
+    box-shadow:0 .22em 0 var(--cs), 0 .42em 0 var(--dark); transition:transform .1s, box-shadow .1s}
+  .c-btn:active{transform:translateY(.22em); box-shadow:0 0 0 var(--cs), 0 .22em 0 var(--dark)}
 </style>
 </head>
 <body>
-<div id="app"></div>
-<div class="toast" id="toast"></div>
+<div id="wrap">
+  <header>
+    <span class="brand"><b>MOVE</b><span class="d">.</span> the techniques</span>
+    <span class="ctx" id="ctx">All 47 · six families</span>
+  </header>
+  <button class="back" id="back">&larr; Back</button>
+  <div id="stage">
+    <div class="cube" id="cubeF"></div>
+    <div class="cube hide" id="cubeT"></div>
+  </div>
+  <div class="hint" id="hint">Drag to spin. Tap a family to open it.</div>
+  <div class="dots hide" id="dots"></div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div id="cardWrap"><div class="card" id="card"></div></div>
 
 <script>
 "use strict";
 
-/* ============================================================
-   MOVE, single file. Brief: DWG LIB-002 REV 2. Content: LIB-002-A.
-   Every move's copy and scoring traces to the verified dossier.
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-   Build REV 4 (safe set, no dependency on the two open decisions):
-   - New Material screen: browse studied topics, their generated items,
-     and the muddiest-point log. Her repository to come back to.
-   - Cards now carry a topic so Material can group them.
-   - Summary now surfaces the muddiest point just named and adds one
-     if-then plan for next time (built locally, not from a model call).
-   - Corrected the graduation copy: it no longer implies the app detects
-     unprompted use. Retirement is the manual button in the moves map.
-   - Warmth pass on the celebrate screen (second person).
+const inkFor = hex => { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return (0.299*r+0.587*g+0.114*b)/255 > 0.5 ? "#3a3733" : "#ffffff"; };
+const shade = (hex,f)=>{ let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  r=Math.round(r*f); g=Math.round(g*f); b=Math.round(b*f);
+  return "#"+[r,g,b].map(x=>Math.max(0,Math.min(255,x)).toString(16).padStart(2,"0")).join(""); };
 
-   STILL PENDING A DECISION (not built here):
-   - Generation: production has no Anthropic endpoint, so questions fall
-     back to a local regex generator. Needs a serverless function to hold
-     a key and call Claude, then a type-aware prompt. Nothing else changes.
-   - Graduation: staged withdrawal (app stops naming the move, asks
-     "which move here?", picking it unprompted across N sessions is the
-     gate). Today it is a self-report button. That is the unobservable
-     trigger; the staged version is the fix, and it changes how a session
-     feels, so it waits for a yes.
-   ============================================================ */
-
-/* ---------- the generation prompt (tightly constrained, live) ----------
-   Turns a photo or paste of the material into retrieval items.
-   Used when an Anthropic endpoint is reachable; falls back to a local
-   generator otherwise so the app works offline / on Netlify with no backend. */
-const GENERATION_PROMPT =
-`You turn a student's own study material into retrieval-practice items.
-RULES:
-- Output ONLY a JSON array. No prose, no explanation, no markdown fences.
-- Each element is an object with exactly two string fields: "q" and "a".
-- "q" forces recall of ONE fact, term, relationship, or step from the material.
-- "a" is the shortest correct answer (under 15 words).
-- Produce 6 to 12 items. One idea per item. Cover the most important points, not trivia.
-- Use ONLY what the material says. Never add outside facts.
-- Prefer questions that require producing the answer from memory (what, why, how, define, what's the difference). Never yes/no.
-- If the material is a set of problems, ask for the METHOD or the TYPE of problem, not the worked numeric answer.
-- No item may be answerable just by rereading the question.`;
-
-const MODEL = "claude-sonnet-4-6";
-let USE_API = true; // tries the endpoint; silently falls back to local if unreachable
-
-/* ---------------------------- MOVE CONTENT ----------------------------
-   Fields per move from the content spec. tier is hidden from the student.
-   kind: 'free' (timed, output on paper, then coverage check)
-       | 'cued' (step through items, self-mark)
-       | 'reflect' (timed, effort-scored, names own gap)         */
-const MOVES = [
-  { id:"braindump", name:"Brain Dump", kind:"free", tier:"high", timer:180, bet:"count", source:"Powerful Teaching · free recall 67% vs concept-map 45% (Karpicke & Blunt 2011)",
-    what:"Close the book and write everything you remember. No checking, no fixing.",
-    read:t=>`Close the book. You're going to write down everything you remember about <b>${t}</b>.`,
-    betq:"How many separate things do you think you'll get?",
-    doi:"Go. Everything you remember. Don't stop to fix it, don't check.",
-    cover:"Tick what you actually covered. Whatever's left is what you missed.",
-    grad:"She closes the book and starts dumping before the app asks." },
-
-  { id:"tellme", name:"Tell Me Without Looking", kind:"cued", tier:"high", timer:0, bet:"countN", source:"Make It Stick · retrieval 71→61% vs reread 83→40% over a week (Roediger & Karpicke 2006)",
-    what:"Books closed. Answer from memory, one question at a time.",
-    read:t=>`Books closed. I'll ask about <b>${t}</b>, you answer, out loud or typed.`,
-    betq:"Out of these questions, how many will you nail?",
-    grad:"She quizzes herself, or asks to be quizzed, without the app drawing it." },
-
-  { id:"space", name:"Space It Out", kind:"cued", tier:"high", timer:0, bet:"countN", source:"Make It Stick · spacing doubles retention at 4 weeks (Rohrer & Taylor 2006)",
-    what:"Older material, pulled back after a gap so a little forgetting happens.",
-    read:t=>`This came up before. Quick gut check on what's still in there.`,
-    betq:"How much of it is still there?",
-    grad:"She brings up an older topic to review on her own." },
-
-  { id:"drawit", name:"Draw It", kind:"reflect", tier:"high (for her)", timer:150, bet:"scale", source:"Dual Coding with Teachers · drawing aids retention (Fernandes 2018, Hu 2015)",
-    what:"Turn the idea into a picture or diagram. No words.",
-    read:t=>`No words this time. Draw <b>${t}</b>, a picture, a diagram, whatever shows the idea.`,
-    betq:"Can you draw it without looking?",
-    doi:"Draw it on paper. Make the idea visual. Boxes, arrows, a sketch.",
-    reflectq:"Now open the book. What did your drawing leave out?",
-    grad:"She sketches or diagrams material on her own." },
-
-  { id:"teach", name:"Teach It Dumber", kind:"reflect", tier:"moderate", timer:120, bet:"scale", source:"Protégé effect (Stanford teachable agents) · output beats input — Convergence 12",
-    what:"Explain it out loud in the simplest words, like teaching a little kid. No notes.",
-    read:t=>`You're going to teach <b>${t}</b> out loud, like you're explaining it to a little kid. Simplest words. No notes.`,
-    betq:"Can you get through it without checking?",
-    doi:"Teach it. Out loud. If you reach for the book, that spot is the gap.",
-    reflectq:"Where did you get stuck or go vague?",
-    grad:"She explains a concept aloud, to someone or herself, without being told." },
-
-  { id:"elaborate", name:"Elaborate", kind:"reflect", tier:"moderate", timer:90, bet:"none", source:"Make It Stick · elaboration multiplies the cues you can recall by",
-    what:"Connect the new thing to something you already know.",
-    read:t=>`One sentence. "<b>${t}</b> is like ___ because ___." Connect it to something you already get.`,
-    doi:"Finish the sentence on paper. Make the link real, not just a word match.",
-    reflectq:"Does the link hold up? A good one is a second handle on the memory.",
-    grad:"She spontaneously connects new material to something she knows." },
-
-  { id:"mapit", name:"Map It", kind:"reflect", tier:"moderate · narrow", timer:180, bet:"none", source:"Make It Stick · spatial structures file material; run AFTER a dump, never instead",
-    what:"Lay the material out in space, each piece where it belongs, connected.",
-    read:t=>`Spread <b>${t}</b> out. Put each piece on the page where it belongs and connect what goes together.`,
-    doi:"Build the map on paper. Space and arrows do the work, not sentences.",
-    reflectq:"Anything you couldn't place is the part you don't have yet. What was it?",
-    grad:"She reaches for a spatial layout on her own when material is tangled." },
-
-  { id:"mixit", name:"Mix It", kind:"cued", tier:"high", timer:0, bet:"countN", source:"Make It Stick · 77% interleaved vs 38% blocked at 24h (Taylor & Rohrer 2010) · similar types only",
-    what:"Practice related problem types together, sorting which is which before solving.",
-    read:t=>`We mix types in this one. The trick: figure out which kind each one is before you solve.`,
-    betq:"How many will you sort correctly?",
-    grad:"She chooses to practice mixed types rather than blocking one." },
-
-  { id:"tryfirst", name:"Try It First", kind:"cued", tier:"high", timer:0, bet:"countN", source:"Make It Stick (generation) · pretest before a lecture → ~10% better later (E. Bjork) · 30% study + 70% reciting beats 100% study (Gates 1917)",
-    what:"Take a swing before you've studied it. Wrong answers prime the real one.",
-    read:t=>`Before you really study <b>${t}</b>, take a swing at it. Wrong is fine, the swing is the whole point.`,
-    betq:"Cold, no studying yet: how many will you get?",
-    grad:"She attempts a problem before reading it or being taught it." },
-
-  { id:"concrete", name:"Make It Concrete", kind:"reflect", tier:"moderate", timer:90, bet:"none", source:"Understanding How We Learn (one of the six) · Why Don't Students Like School · guard: use 2+, push back to the principle",
-    what:"Turn the abstract idea into your own specific, made-up example.",
-    read:t=>`Make <b>${t}</b> concrete. Invent your own example of it, something specific and real to you.`,
-    doi:"Write your example on paper. Then a second one that's different from the first.",
-    reflectq:"Does your example actually fit the rule, or just sound like it? Push it back to the principle.",
-    grad:"She makes up her own example without being asked." },
-
-  { id:"palace", name:"Build a Palace", kind:"reflect", tier:"moderate · narrow", timer:180, bet:"scale", source:"Learning How to Learn (Ch 8; the memory palace runs on visuospatial memory, supersized vs verbal) · Make It Stick (mnemonics)",
-    what:"Place the items along a route you know by heart. Walk it to pull them back.",
-    read:t=>`Pick a place you know cold, your room, your walk to school. Put each piece of <b>${t}</b> somewhere along it.`,
-    betq:"Can you walk the route and pull them all back?",
-    doi:"Build the route on paper or in your head. One item per spot, make each one vivid.",
-    reflectq:"Walk it back. Which spots came up empty? Those are the ones to redo.",
-    grad:"She builds a route for a list on her own." },
-
-  { id:"crackword", name:"Crack the Word", kind:"reflect", tier:"moderate · her bridge", timer:120, bet:"none", source:"Executive Skills in Reading Comprehension (morphology) · profile EC-001 Strategy 03: build words from roots the way Chinese characters are built",
-    what:"Break a hard word into its root and parts. The meaning is usually built right in.",
-    read:t=>`Take the hard words in <b>${t}</b>. Don't memorise them whole. Break each into root, prefix, suffix, like building a character from parts.`,
-    doi:"On paper, split each word into its pieces and write what each piece means. Build the meaning from the parts.",
-    reflectq:"Which words cracked open once you saw the parts? Which roots show up again and again?",
-    grad:"She breaks an unfamiliar word into roots on her own instead of guessing or memorising it whole." },
-];
-const moveById = id => MOVES.find(m=>m.id===id);
-
-const EXCLUDED = [
-  { name:"Rereading", instead:"Brain Dump",
-    body:"Reading your notes again. Feels like studying. Mostly isn't. In one study, people who reread were down to 40% a week later, and they thought they'd remember more than people who tested themselves. Pulling it from memory with the book closed is what sticks." },
-  { name:"Highlighting", instead:"Tell Me Without Looking",
-    body:"Colouring the page. Feels active. But the marking isn't the learning, the remembering is. A bright page can hide how little is actually in your head." },
-  { name:"Neat Recopied Notes", instead:"Map It",
-    body:"Rewriting your notes to look tidy. It's copying, not recalling. A pretty page hides how little is actually in your head." },
+/* families: index -> face of level-1 cube (0 front,1 right,2 left,3 top,4 bottom,5 back) */
+const FAM=[
+  {n:"Learn It",    c:"#477cfb", bl:"New material, start to finish. Guess, take a swing before you've studied, turn it into a picture, pull it back cold."},
+  {n:"Keep It",     c:"#61c470", bl:"Bring old material back after a gap so it sticks. Guess, space it, review, out."},
+  {n:"Exam",        c:"#e85151", bl:"Get ready for a test. Mix the types, hard-start the hard one, learn from the postmortem."},
+  {n:"Unstuck",     c:"#ffc34c", bl:"When you can't start or you stall. It runs from the door to Guess First, where the learning lines begin."},
+  {n:"Why It Works",c:"#8a5bd6", bl:"The physics under the network. Not stations, the reasons the routes run the way they do."},
+  {n:"Not On The Map", c:"#8a8f98", bl:"Feels like studying, isn't. Do the move named on each one instead."},
 ];
 
-/* The full field, sorted from LIB-001's 77 techniques: the ones that help, kept.
-   extraMoves = student-doable moves beyond the drillable core (shown, not drilled in v1).
-   why = how learning works (understanding, not tasks).
-   Coach moves and low-evidence reading rituals are deliberately not here (they live in the dossier). */
-const LIBRARY = {
-  extraMoves: [
-    { name:"Sketchnote", line:"Take notes as drawings, arrows and icons instead of sentences, so your hand keeps pace with how fast you think. Words are your slow lane; pictures aren't.", src:"profile EC-001 Strategy 04 · Dual Coding with Teachers" },
-    { name:"Chunk It", line:"Group a long list into a few labelled bundles. Working memory holds about seven things; a chunk lets one slot carry many.", src:"Learning How to Learn (Miller 1956)" },
-    { name:"Self-Explain", line:"Go step by step and say why each step is right, not just what it is. The gaps show up fast.", src:"Learn Better · Understanding How We Learn" },
-    { name:"Use an Analogy", line:"Find what the idea works like. \"This is the same as ___.\" Comparison is how you actually understand it.", src:"Why Don't Students Like School (Holyoak)" },
-    { name:"Sprint and Break", line:"Work one focused sprint of about 25 minutes, then a real break. The break is when it sinks in, not wasted time.", src:"Uncommon Sense Teaching (Pomodoro; brain breaks)" },
-    { name:"Walk It Off", line:"Stuck? Leave it and move. Your background brain keeps working and often hands you the answer.", src:"How We Learn (incubation; focused vs diffuse)" },
-    { name:"Get Started", line:"The hardest part is starting. Do just the first two minutes, on purpose badly. Momentum does the rest.", src:"Smart but Scattered Teens (task initiation)" },
-    { name:"Plan It", line:"Break the work into steps and put them in order before you start. A plan beats willpower.", src:"Smart but Scattered Teens (planning)" },
-    { name:"Find the Hook", line:"Before you start, find one reason this matters to you. Material you care about sticks harder.", src:"Learn Better (learn crafting)" },
-    { name:"Set a Process Goal", line:"Aim at \"do ten problems,\" not \"get an A.\" You control the effort, not the grade.", src:"Learn Better (process vs outcome goals)" },
-    { name:"Review As You Learn", line:"Glance back over today's material the same day, briefly. A little review now saves a lot later.", src:"Brain Train (RAYL; Ebbinghaus)" },
-    { name:"Study Somewhere New", line:"Change where you study sometimes. Different places give your memory more hooks to find it by.", src:"How We Learn (context variability)" },
-    { name:"Steady the Nerves", line:"When it tips from hard into panic, stop and breathe; hard is fine, panic isn't. And the way out of putting it off is one small first step, not a big push.", src:"Neuroteach (amygdala; zone of proximal discomfort) · Ace Your Exam" },
-    { name:"Hard-Start (exams)", line:"In a test, start a hard question, then leave it and do the easy ones. Your background brain chews on the hard one while you bank marks.", src:"Uncommon Sense Teaching (hard-start)" },
-    { name:"Exam Postmortem", line:"After a test, sort your mistakes by type. The pattern tells you exactly what to fix next time.", src:"Ace Your Exam (five error types)" },
-  ],
-  why: [
-    { name:"Race-Car vs Hiker Brain", line:"Fast processors (race-cars) get there quick but skim the scenery; slower ones (hikers) catch more detail. Neither is smarter. Yours is a race-car, so slowing down on purpose is your edge.", src:"Uncommon Sense Teaching" },
-    { name:"The Two Illusions", line:"Why \"I get it\" lies: rereading feels easy (that's fluency), and feeling sure isn't being right (that's confidence). The guess catches both.", src:"Powerful Teaching" },
-    { name:"Forget a Little, Learn More", line:"Forgetting a bit between sessions isn't failing. The effort to pull it back is what makes it stick harder.", src:"How We Learn (Bjork)" },
-    { name:"Learn It, Link It", line:"Memory is connections. A new fact sticks when it hooks onto something you already know.", src:"Uncommon Sense Teaching (Hebbian learning)" },
-    { name:"Two Kinds of Learning", line:"Facts and skills travel different routes in your brain. Skills need doing, spread over time; you can't cram them in.", src:"Uncommon Sense Teaching (declarative vs procedural)" },
-    { name:"Deep vs Surface", line:"Beginners sort problems by how they look; experts sort by what's really going on underneath. Mixing problems trains that.", src:"Learn Better" },
-    { name:"Practice Rewires You", line:"Repetition physically speeds up your brain's wiring. Getting faster is real, not just a feeling.", src:"Neuroteach (myelination)" },
-    { name:"Why Breaks Solve It", line:"Your brain has a tight focused mode and a loose background mode. The stuck problem often cracks in the loose one, on a walk.", src:"Learning How to Learn (focused vs diffuse)" },
-    { name:"Start and End Stick Most", line:"You remember the beginning and end of a session best. Put the important stuff there, not buried in the middle.", src:"Neuroteach (primacy-recency)" },
-    { name:"Why School Is Hard", line:"Your brain evolved for faces and talking, not reading and algebra. Those take deliberate practice; struggling with them is normal.", src:"Uncommon Sense Teaching (biologically primary vs secondary)" },
-    { name:"Wrong First, Right Later", line:"Taking a real swing and missing primes your brain for the answer. The wrong attempt is the learning, not a fail.", src:"Learn Better (productive failure, Kapur)" },
-    { name:"Knowledge Before Thinking", line:"You can't think hard about something you barely know. Facts first are what make the clever stuff possible.", src:"Why Don't Students Like School" },
-    { name:"Ability Is Built", line:"Smart isn't fixed. Effort and the right practice grow it; your brain changes when you push it.", src:"Neuroteach (growth mindset)" },
-    { name:"Sleep Saves It", line:"Sleep is when the day's learning gets filed into long-term memory. A late cram you don't sleep on barely counts.", src:"Neuroteach (sleep)" },
-    { name:"The Unfinished Problem", line:"Leave a problem half-done and your mind keeps it active in the background, picking up clues. You can use that on purpose.", src:"How We Learn (Zeigarnik; percolation)" },
-  ],
+/* every technique. fam = family indices it belongs to. content pulled from the app. */
+const T=[
+  {n:`Guess First`, fam:[0,1,2], what:`Before any recall move, call your shot: predict how much you'll get, then find out. The gap between guess and got is the whole game.`, src:`Make It Stick (calibration)`},
+  {n:`Muddiest Point`, fam:[0,1,2], what:`Before you close, name the one thing still fuzzy. It comes back first next time.`, src:`Range (Lovett); Neuroteach (exit ticket)`},
+
+  {n:`Try It First`, fam:[0], what:`Take a swing before you've studied it. Wrong answers prime the real one.`, src:`Make It Stick (generation); pretest before a lecture ~10% better later (E. Bjork); 30% study + 70% reciting beats 100% study (Gates 1917)`},
+  {n:`Draw It`, fam:[0], what:`Turn the idea into a picture or diagram. No words.`, how:`Draw it on paper. Make the idea visual: boxes, arrows, a sketch. Then open the book and see what it left out.`, src:`Dual Coding with Teachers; drawing aids retention (Fernandes 2018, Hu 2015)`},
+  {n:`Sketchnote`, fam:[0], what:`Take notes as drawings, arrows and icons instead of sentences, so your hand keeps pace with how fast you think. Words are your slow lane; pictures aren't.`, src:`profile EC-001 Strategy 04; Dual Coding with Teachers`},
+  {n:`Map It`, fam:[0], what:`Lay the material out in space, each piece where it belongs, connected.`, how:`Build the map on paper. Space and arrows do the work, not sentences. Run it after a brain dump, never instead.`, src:`Make It Stick; spatial structures file material`},
+  {n:`Build a Palace`, fam:[0], what:`Place the items along a route you know by heart. Walk it to pull them back.`, how:`One vivid item per spot on a familiar path. Walk it back; the empty spots are what to redo.`, src:`Learning How to Learn (Ch 8); Make It Stick (mnemonics)`},
+  {n:`Crack the Word`, fam:[0], what:`Break a hard word into its root and parts. The meaning is usually built right in.`, how:`Split each word into its pieces and write what each piece means. Build the meaning from the parts.`, src:`Executive Skills in Reading Comprehension (morphology); profile EC-001 Strategy 03`},
+  {n:`Chunk It`, fam:[0], what:`Group a long list into a few labelled bundles. Working memory holds about seven things; a chunk lets one slot carry many.`, src:`Learning How to Learn (Miller 1956)`},
+  {n:`Brain Dump`, fam:[0], what:`Close the book and write everything you remember. No checking, no fixing.`, how:`Go. Everything you remember, don't stop to fix it. Then tick what you covered; whatever's left is what you missed.`, src:`Powerful Teaching; free recall 67% vs concept-map 45% (Karpicke & Blunt 2011)`},
+  {n:`Tell Me Without Looking`, fam:[0], what:`Books closed. Answer from memory, one question at a time.`, src:`Make It Stick; retrieval 71 to 61% vs reread 83 to 40% over a week (Roediger & Karpicke 2006)`},
+  {n:`Teach It Dumber`, fam:[0], what:`Explain it out loud in the simplest words, like teaching a little kid. No notes.`, how:`Teach it, out loud. If you reach for the book, that spot is the gap.`, src:`Protege effect (Stanford teachable agents); output beats input`},
+  {n:`Self-Explain`, fam:[0], what:`Go step by step and say why each step is right, not just what it is. The gaps show up fast.`, src:`Learn Better; Understanding How We Learn`},
+  {n:`Use an Analogy`, fam:[0], what:`Find what the idea works like. "This is the same as ___." Comparison is how you actually understand it.`, src:`Why Don't Students Like School (Holyoak)`},
+  {n:`Make It Concrete`, fam:[0], what:`Turn the abstract idea into your own specific, made-up example.`, how:`Write your example on paper, then a second one that's different. Check each actually fits the rule.`, src:`Understanding How We Learn; Why Don't Students Like School`},
+  {n:`Elaborate`, fam:[0], what:`Connect the new thing to something you already know.`, how:`Finish "X is like ___ because ___" with a real link, not just a word match.`, src:`Make It Stick; elaboration multiplies the cues you can recall by`},
+
+  {n:`Space It Out`, fam:[1], what:`Older material, pulled back after a gap so a little forgetting happens.`, src:`Make It Stick; spacing doubles retention at 4 weeks (Rohrer & Taylor 2006)`},
+  {n:`Review As You Learn`, fam:[1], what:`Glance back over today's material the same day, briefly. A little review now saves a lot later.`, src:`Brain Train (RAYL; Ebbinghaus)`},
+
+  {n:`Mix It`, fam:[2], what:`Practice related problem types together, sorting which is which before solving.`, src:`Make It Stick; 77% interleaved vs 38% blocked at 24h (Taylor & Rohrer 2010); similar types only`},
+  {n:`Hard-Start`, fam:[2], what:`In a test, start a hard question, then leave it and do the easy ones. Your background brain chews on the hard one while you bank marks.`, src:`Uncommon Sense Teaching (hard-start)`},
+  {n:`Exam Postmortem`, fam:[2], what:`After a test, sort your mistakes by type. The pattern tells you exactly what to fix next time.`, src:`Ace Your Exam (five error types)`},
+
+  {n:`Get Started`, fam:[3], what:`The hardest part is starting. Do just the first two minutes, on purpose badly. Momentum does the rest.`, src:`Smart but Scattered Teens (task initiation)`},
+  {n:`Plan It`, fam:[3], what:`Break the work into steps and put them in order before you start. A plan beats willpower.`, src:`Smart but Scattered Teens (planning)`},
+  {n:`Find the Hook`, fam:[3], what:`Before you start, find one reason this matters to you. Material you care about sticks harder.`, src:`Learn Better (learn crafting)`},
+  {n:`Set a Process Goal`, fam:[3], what:`Aim at "do ten problems," not "get an A." You control the effort, not the grade.`, src:`Learn Better (process vs outcome goals)`},
+  {n:`Study Somewhere New`, fam:[3], what:`Change where you study sometimes. Different places give your memory more hooks to find it by.`, src:`How We Learn (context variability)`},
+  {n:`Sprint and Break`, fam:[3], what:`Work one focused sprint of about 25 minutes, then a real break. The break is when it sinks in, not wasted time.`, src:`Uncommon Sense Teaching (Pomodoro; brain breaks)`},
+  {n:`Walk It Off`, fam:[3], what:`Stuck? Leave it and move. Your background brain keeps working and often hands you the answer.`, src:`How We Learn (incubation; focused vs diffuse)`},
+  {n:`Steady the Nerves`, fam:[3], what:`When it tips from hard into panic, stop and breathe; hard is fine, panic isn't. The way out of putting it off is one small first step, not a big push.`, src:`Neuroteach (amygdala; zone of proximal discomfort); Ace Your Exam`},
+
+  {n:`Race-Car vs Hiker Brain`, fam:[4], what:`Fast processors (race-cars) get there quick but skim the scenery; slower ones (hikers) catch more detail. Neither is smarter. Yours is a race-car, so slowing down on purpose is your edge.`, src:`Uncommon Sense Teaching`},
+  {n:`The Two Illusions`, fam:[4], what:`Why "I get it" lies: rereading feels easy (that's fluency), and feeling sure isn't being right (that's confidence). The guess catches both.`, src:`Powerful Teaching`},
+  {n:`Forget a Little, Learn More`, fam:[4], what:`Forgetting a bit between sessions isn't failing. The effort to pull it back is what makes it stick harder.`, src:`How We Learn (Bjork)`},
+  {n:`Learn It, Link It`, fam:[4], what:`Memory is connections. A new fact sticks when it hooks onto something you already know.`, src:`Uncommon Sense Teaching (Hebbian learning)`},
+  {n:`Two Kinds of Learning`, fam:[4], what:`Facts and skills travel different routes in your brain. Skills need doing, spread over time; you can't cram them in.`, src:`Uncommon Sense Teaching (declarative vs procedural)`},
+  {n:`Deep vs Surface`, fam:[4], what:`Beginners sort problems by how they look; experts sort by what's really going on underneath. Mixing problems trains that.`, src:`Learn Better`},
+  {n:`Practice Rewires You`, fam:[4], what:`Repetition physically speeds up your brain's wiring. Getting faster is real, not just a feeling.`, src:`Neuroteach (myelination)`},
+  {n:`Why Breaks Solve It`, fam:[4], what:`Your brain has a tight focused mode and a loose background mode. The stuck problem often cracks in the loose one, on a walk.`, src:`Learning How to Learn (focused vs diffuse)`},
+  {n:`Start and End Stick Most`, fam:[4], what:`You remember the beginning and end of a session best. Put the important stuff there, not buried in the middle.`, src:`Neuroteach (primacy-recency)`},
+  {n:`Why School Is Hard`, fam:[4], what:`Your brain evolved for faces and talking, not reading and algebra. Those take deliberate practice; struggling with them is normal.`, src:`Uncommon Sense Teaching (biologically primary vs secondary)`},
+  {n:`Wrong First, Right Later`, fam:[4], what:`Taking a real swing and missing primes your brain for the answer. The wrong attempt is the learning, not a fail.`, src:`Learn Better (productive failure, Kapur)`},
+  {n:`Knowledge Before Thinking`, fam:[4], what:`You can't think hard about something you barely know. Facts first are what make the clever stuff possible.`, src:`Why Don't Students Like School`},
+  {n:`Ability Is Built`, fam:[4], what:`Smart isn't fixed. Effort and the right practice grow it; your brain changes when you push it.`, src:`Neuroteach (growth mindset)`},
+  {n:`Sleep Saves It`, fam:[4], what:`Sleep is when the day's learning gets filed into long-term memory. A late cram you don't sleep on barely counts.`, src:`Neuroteach (sleep)`},
+  {n:`The Unfinished Problem`, fam:[4], what:`Leave a problem half-done and your mind keeps it active in the background, picking up clues. You can use that on purpose.`, src:`How We Learn (Zeigarnik; percolation)`},
+
+  {n:`Rereading`, fam:[5], what:`Reading your notes again. Feels like studying. Mostly isn't. In one study, people who reread were down to 40% a week later, and thought they'd remember more than people who tested themselves. Pulling it from memory with the book closed is what sticks.`, instead:`Brain Dump`, src:`Do this instead: Brain Dump`},
+  {n:`Highlighting`, fam:[5], what:`Colouring the page. Feels active. But the marking isn't the learning, the remembering is. A bright page can hide how little is actually in your head.`, instead:`Tell Me Without Looking`, src:`Do this instead: Tell Me Without Looking`},
+  {n:`Neat Recopied Notes`, fam:[5], what:`Rewriting your notes to look tidy. It's copying, not recalling. A pretty page hides how little is actually in your head.`, instead:`Map It`, src:`Do this instead: Map It`},
+];
+
+/* ---------- one icon per technique (simple monoline glyphs) ---------- */
+function svg(inner,sz){ sz=sz||20; return '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(inner||'<circle cx="12" cy="12" r="3"/>')+'</svg>'; }
+const ICON={
+  "Guess First":`<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>`,
+  "Muddiest Point":`<line x1="5" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="19" y2="12"/><line x1="5" y1="16" x2="14" y2="16"/>`,
+  "Brain Dump":`<path d="M4 14v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/><line x1="12" y1="3" x2="12" y2="14"/><polyline points="8 10 12 14 16 10"/>`,
+  "Tell Me Without Looking":`<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6"/><circle cx="12" cy="12" r="2.5"/><line x1="3" y1="3" x2="21" y2="21"/>`,
+  "Space It Out":`<line x1="3" y1="12" x2="21" y2="12"/><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="10" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.4" fill="currentColor" stroke="none"/>`,
+  "Try It First":`<polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2"/>`,
+  "Draw It":`<path d="M4 20l3-1 11-11-2-2L5 17l-1 3z"/><line x1="14" y1="6" x2="18" y2="10"/>`,
+  "Sketchnote":`<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 9c2 2 4-2 6 0s3-1 4 0"/>`,
+  "Map It":`<circle cx="6" cy="6" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="10" cy="18" r="2"/><line x1="7.4" y1="7.4" x2="8.6" y2="16.6"/><line x1="7.8" y1="6.4" x2="16" y2="7.6"/>`,
+  "Build a Palace":`<path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/>`,
+  "Crack the Word":`<rect x="3" y="9" width="18" height="6" rx="1"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="15" y1="9" x2="15" y2="15"/>`,
+  "Chunk It":`<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>`,
+  "Teach It Dumber":`<path d="M2 9l10-4 10 4-10 4-10-4z"/><path d="M6 11v4c0 1 3 2 6 2s6-1 6-2v-4"/>`,
+  "Self-Explain":`<path d="M4 5h16v10H9l-4 4v-4H4z"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/>`,
+  "Use an Analogy":`<circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/>`,
+  "Make It Concrete":`<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5l8 4.5 8-4.5"/><line x1="12" y1="12" x2="12" y2="21"/>`,
+  "Elaborate":`<rect x="3" y="9" width="11" height="6" rx="3"/><rect x="10" y="9" width="11" height="6" rx="3"/>`,
+  "Review As You Learn":`<path d="M20 12a8 8 0 1 1-2.3-5.6"/><polyline points="20 4 20 8 16 8"/>`,
+  "Mix It":`<path d="M4 7h4l8 10h4"/><path d="M4 17h4l8-10h4"/><polyline points="17 4 20 7 17 10"/><polyline points="17 14 20 17 17 20"/>`,
+  "Hard-Start":`<path d="M3 19l6-11 4 6 2-3 6 8z"/>`,
+  "Exam Postmortem":`<circle cx="10" cy="10" r="6"/><line x1="15" y1="15" x2="20" y2="20"/>`,
+  "Get Started":`<polygon points="7 4 20 12 7 20 7 4"/>`,
+  "Plan It":`<rect x="5" y="4" width="14" height="17" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>`,
+  "Find the Hook":`<path d="M12 20s-7-4.5-7-9a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 4.5-7 9-7 9z"/>`,
+  "Set a Process Goal":`<line x1="6" y1="3" x2="6" y2="21"/><path d="M6 4h11l-2.5 3.5L17 11H6"/>`,
+  "Study Somewhere New":`<path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>`,
+  "Sprint and Break":`<circle cx="12" cy="13" r="7"/><line x1="12" y1="13" x2="12" y2="9"/><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="2" x2="12" y2="4"/>`,
+  "Walk It Off":`<circle cx="13" cy="4" r="2"/><path d="M13 6l-2 6 3 3"/><path d="M11 12l-3 2"/><path d="M13 8l3 2"/>`,
+  "Steady the Nerves":`<path d="M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/>`,
+  "Race-Car vs Hiker Brain":`<path d="M3 14l2-4h14l2 4v3H3z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/>`,
+  "The Two Illusions":`<circle cx="10" cy="12" r="6"/><circle cx="14" cy="12" r="6" stroke-dasharray="2 2"/>`,
+  "Forget a Little, Learn More":`<circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><polyline points="12 7 12 12 16 14"/>`,
+  "Learn It, Link It":`<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="12" r="2.5"/><line x1="8.5" y1="12" x2="15.5" y2="12"/>`,
+  "Two Kinds of Learning":`<path d="M12 20v-5l-5-5V4"/><path d="M12 15l5-5V4"/>`,
+  "Deep vs Surface":`<line x1="3" y1="9" x2="21" y2="9"/><path d="M8 9l4-4 4 4-1.5 9h-5z"/>`,
+  "Practice Rewires You":`<polyline points="4 16 9 11 13 15 20 6"/><polyline points="15 6 20 6 20 11"/>`,
+  "Why Breaks Solve It":`<path d="M5 8h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8z"/><path d="M16 9h2a2 2 0 0 1 0 4h-2"/>`,
+  "Start and End Stick Most":`<line x1="5" y1="5" x2="5" y2="19"/><line x1="10" y1="13" x2="10" y2="19"/><line x1="14" y1="13" x2="14" y2="19"/><line x1="19" y1="5" x2="19" y2="19"/>`,
+  "Why School Is Hard":`<path d="M4 20h4v-4h4v-4h4v-4h4"/>`,
+  "Wrong First, Right Later":`<path d="M4 8l4 4"/><path d="M8 8l-4 4"/><polyline points="12 11 15 14 20 7"/>`,
+  "Knowledge Before Thinking":`<rect x="6" y="14" width="12" height="5" rx="1"/><rect x="8" y="9" width="8" height="5" rx="1"/><rect x="10" y="4" width="4" height="5" rx="1"/>`,
+  "Ability Is Built":`<path d="M12 21v-8"/><path d="M12 13c-3 0-5-2-5-5 3 0 5 2 5 5z"/><path d="M12 15c3 0 5-2 5-5-3 0-5 2-5 5z"/>`,
+  "Sleep Saves It":`<path d="M20 14a8 8 0 1 1-9-11 6 6 0 0 0 9 11z"/>`,
+  "The Unfinished Problem":`<path d="M12 4a8 8 0 1 1-6 3"/>`,
+  "Rereading":`<path d="M4 5h6a2 2 0 0 1 2 2v11a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v11a2 2 0 0 1 2-2h6z"/><line x1="3" y1="21" x2="21" y2="3"/>`,
+  "Highlighting":`<rect x="4" y="10" width="14" height="5" rx="1"/><line x1="3" y1="20" x2="20" y2="4"/>`,
+  "Neat Recopied Notes":`<rect x="4" y="5" width="10" height="13" rx="1"/><rect x="9" y="8" width="10" height="13" rx="1"/><line x1="3" y1="21" x2="21" y2="4"/>`,
 };
 
-/* ----------------------------- STORAGE ----------------------------- */
-const KEY="move.v1";
-let mem=null; // in-memory fallback if storage blocked
-function load(){
-  try{ const r=localStorage.getItem(KEY); if(r) return JSON.parse(r); }catch(e){}
-  if(mem) return mem;
-  return null;
-}
-function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){ mem=DB; }
-}
-function freshProfile(name){
-  const moves={}; MOVES.forEach(m=>moves[m.id]={status:"active", unprompted:0});
-  return { name, moves, cards:[], gapHistory:[], sessions:[], muddiest:[] };
-}
-let DB = load() || { active:0, profiles:[freshProfile("Emma")] };
-// migrate older saves: make sure any move added later has a state
-DB.profiles.forEach(p=>{ MOVES.forEach(m=>{ if(!p.moves[m.id]) p.moves[m.id]={status:"active",unprompted:0}; }); });
-function P(){ return DB.profiles[DB.active]; }
-function today(){ return Math.floor(Date.now()/86400000); }
-
-/* ------------------------------- SM-2 ------------------------------- */
-function addCards(items, topic){
-  const p=P(); const t=today();
-  items.forEach(it=>{
-    p.cards.push({ id:"c"+Math.random().toString(36).slice(2,9), q:it.q, a:it.a, topic:topic||"",
-      ef:2.5, interval:0, reps:0, due:t, born:t });
-  });
-}
-function sm2(card, quality){ // quality 0..5
-  if(quality<3){ card.reps=0; card.interval=1; }
-  else{
-    card.reps+=1;
-    card.interval = card.reps===1?1 : card.reps===2?6 : Math.round(card.interval*card.ef);
-  }
-  card.ef = Math.max(1.3, card.ef + (0.1 - (5-quality)*(0.08+(5-quality)*0.02)));
-  card.interval = Math.min(card.interval, 30); // cap at 30 days (brief)
-  card.due = today()+card.interval;
-}
-function dueCards(n){
-  const t=today();
-  return P().cards.filter(c=>c.due<=t && c.born<t).sort((a,b)=>a.due-b.due).slice(0,n);
-}
-
-/* --------------------------- GENERATION --------------------------- */
-async function generateItems(topic, text){
-  const clean=(text||"").trim();
-  if(USE_API && clean.length>40){
-    try{
-      const r = await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ model:MODEL, max_tokens:1000,
-          messages:[{role:"user", content:`${GENERATION_PROMPT}\n\nTOPIC: ${topic||"(untitled)"}\n\nMATERIAL:\n${clean}`}] })
-      });
-      if(r.ok){
-        const data=await r.json();
-        const out=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
-        const arr=JSON.parse(out.replace(/```json|```/g,"").trim());
-        const items=arr.filter(o=>o&&o.q&&o.a).map(o=>({q:String(o.q), a:String(o.a)}));
-        if(items.length) return items;
-      }
-    }catch(e){ /* fall through to local */ }
-  }
-  return localItems(clean, topic);
-}
-function localItems(text, topic){
-  if(!text) return [];
-  // split into candidate statements
-  let parts = text.split(/\n+/).flatMap(line=>{
-    line=line.replace(/^[\s•\-\*\d\.\)]+/,"").trim();
-    return line.split(/(?<=[.;!?])\s+(?=[A-Z(])/);
-  }).map(s=>s.trim()).filter(s=>s.length>22 && /[a-z]/.test(s));
-  const items=[]; const seen=new Set();
-  const stop=new Set("the a an of to in on and or is are was were be been being that this these those with for from as by it its their his her our your they we you i".split(" "));
-  for(const s of parts){
-    if(items.length>=12) break;
-    let q=null,a=null;
-    let m = s.match(/^(.{3,60}?)\s+(?:is|are|was|were|means|refers to|is called|is defined as)\s+(.{3,})$/i);
-    if(m){ q=`What is ${m[1].trim().replace(/[.,;:]$/,"")}?`; a=m[2].replace(/[.;]$/,"").trim(); }
-    if(!q){ m=s.match(/^([^:]{3,50}):\s+(.{4,})$/); if(m){ q=m[1].trim()+"?"; a=m[2].replace(/[.;]$/,"").trim(); } }
-    if(!q){ const num=s.match(/\b(\d[\d,\.]*%?)\b/); if(num){ a=num[1]; q=s.replace(num[0],"_____").replace(/[.;]$/,"").trim()+ (/[?.]$/.test(s)?"":""); } }
-    if(!q){
-      const words=s.split(/\s+/);
-      let best="",bi=-1;
-      for(let i=0;i<words.length;i++){ const w=words[i].replace(/[^\w]/g,""); if(w.length>best.length && !stop.has(w.toLowerCase()) && /[A-Za-z]/.test(w)){ best=w; bi=i; } }
-      if(best && bi>=0){ a=best; const copy=words.slice(); copy[bi]=copy[bi].replace(best,"_____"); q=copy.join(" ").replace(/[.;]$/,"").trim(); }
-    }
-    if(q&&a){ const key=q.toLowerCase().slice(0,40); if(!seen.has(key) && a.length<90){ seen.add(key); items.push({q,a}); } }
-  }
-  return items;
-}
-
-/* ------------------------------ STATE ------------------------------ */
-let S = { screen:"home" }; // session state lives in S.sess when running
-
-/* ------------------------------ ROUTER ----------------------------- */
-const app=document.getElementById("app");
-function go(screen){ S.screen=screen; render(); window.scrollTo(0,0); }
-function render(){
-  app.innerHTML="";
-  app.classList.remove("wide");
-  const fn = ({home:Home, capture:Capture, session:Session, summary:Summary, library:Library, material:Material})[S.screen] || Home;
-  app.appendChild(fn());
-}
-function div(cls,html){ const d=document.createElement("div"); if(cls)d.className=cls; if(html!=null)d.innerHTML=html; return d; }
-function topbar(showProfile=true){
-  const t=div("top");
-  t.innerHTML=`<span class="brand">MOVE<span class="dot">.</span></span>`;
-  if(showProfile){
-    const c=div("chip"); c.textContent=P().name+"  ⌄"; c.onclick=switchProfile; t.appendChild(c);
-  } else {
-    const c=div("chip"); c.textContent="Back"; c.onclick=()=>go("home"); t.appendChild(c);
-  }
-  return t;
-}
-function toast(msg){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),2200); }
-
-/* ------------------------------ HOME ------------------------------- */
-function Home(){
-  const s=div("scr"); s.appendChild(topbar());
-  const due=dueCards(99).length;
-  const grad=MOVES.filter(m=>P().moves[m.id].status==="graduated").length;
-
-  // a stranger who gets this link needs to know what it is; a returning user does not
-  const seen = P().sessions.length>0 || P().cards.length>0;
-  if(!seen){
-    s.appendChild(div(null,`<h1 class="display" style="font-size:38px;margin-top:20px;line-height:1.1">Turn your notes into a study session.</h1>`));
-    s.appendChild(div("fp-lede","MOVE runs a few proven study techniques on your own material, one move at a time."));
-  } else {
-    const head = due ? `${due} due today` : "All caught up";
-    s.appendChild(div(null,`<h1 class="display" style="font-size:40px;margin-top:20px">${head}</h1>`));
-  }
-
-  // CTA up top, so a returning night is one tap
-  const cta=div("fp-cta");
-  const b1=div("btn btn-primary mb"); b1.textContent = due ? `Start · ${due} due` : "Start"; b1.onclick=()=>startFlow("full");
-  const b2=div("btn btn-ghost"); b2.textContent="Just two moves"; b2.onclick=()=>startFlow("two");
-  cta.appendChild(b1); cta.appendChild(b2);
-  s.appendChild(cta);
-  if(grad){ s.appendChild(div("faint",`<div style="margin-top:12px;font-size:13px">${grad} move${grad>1?"s":""} retired. You do ${grad>1?"those":"that"} on your own now.</div>`)); }
-
-  // proof lives one tap away in the moves map, not on the home screen
-
-  // daily hub
-  const ll=div("linklist"); ll.style.marginTop="30px";
-  const a=div("tlink"); a.textContent="See every move"; a.onclick=()=>go("library");
-  const a2=div("tlink"); a2.textContent="What you've studied"; a2.onclick=()=>go("material");
-  ll.appendChild(a); ll.appendChild(a2);
-  s.appendChild(ll);
-
-  s.appendChild(div("spacer"));
-  return s;
-}
-
-function startFlow(mode){ S.pendingMode=mode; go("capture"); }
-
-/* ----------------------------- CAPTURE ----------------------------- */
-function Capture(){
-  const s=div("scr"); s.appendChild(topbar(false));
-  s.appendChild(div(null,`<div style="margin-top:24px"><div class="eyebrow mb-s">Step one</div>
-    <div class="prompt">What are you working on?</div></div>`));
-
-  const wrap=div(); wrap.style.marginTop="22px";
-  wrap.innerHTML=`<div class="field-lab">Topic</div>`;
-  const topic=document.createElement("input"); topic.type="text"; topic.placeholder="e.g. Photosynthesis, Chapter 4";
-  wrap.appendChild(topic);
-
-  const lab2=div("field-lab"); lab2.style.marginTop="16px"; lab2.textContent="Paste your notes, or type the key bits";
-  wrap.appendChild(lab2);
-  const ta=document.createElement("textarea"); ta.placeholder="Paste your notes here. The more you give it, the better the questions."; ta.style.minHeight="160px";
-  wrap.appendChild(ta);
-
-  const micRow=div(); micRow.style.marginTop="10px";
-  micRow.appendChild(voiceButton(ta,"Dictate instead"));
-  wrap.appendChild(micRow);
-
-  const phNote=div("note"); phNote.style.marginTop="16px";
-  phNote.innerHTML="Photo capture reads your page automatically once the backend is wired. For now, paste or dictate, it takes ten seconds.";
-  wrap.appendChild(phNote);
-  s.appendChild(wrap);
-
-  s.appendChild(div("spacer"));
-  const go1=div("btn btn-primary"); go1.textContent="Build my session";
-  go1.onclick=async ()=>{
-    const txt=ta.value.trim();
-    if(txt.length<25){ toast("Give it a bit more to work with."); return; }
-    go1.textContent="Reading it…"; go1.disabled=true;
-    const items=await generateItems(topic.value.trim(), txt);
-    if(!items.length){ go1.textContent="Build my session"; go1.disabled=false; toast("Couldn't find clear items. Try fuller sentences."); return; }
-    addCards(items, topic.value.trim()); save();
-    buildSession(S.pendingMode, topic.value.trim()||"your work", items);
-  };
-  s.appendChild(go1);
-  return s;
-}
-
-/* ------------------------- BUILD A SESSION ------------------------- */
-function buildSession(mode, topic, freshItems){
-  const p=P();
-  const activeRetrieval = ["braindump","tellme"].filter(id=>p.moves[id].status==="active");
-  const queue=[];
-  const act = id => p.moves[id] && p.moves[id].status==="active";
-  const pushIf = id => { if(act(id) && !queue.includes(id)) queue.push(id); };
-
-  // always open on a retrieval move on the material (retrieval is the proven channel)
-  if(activeRetrieval.length) queue.push(activeRetrieval[0]);
-
-  if(mode==="full"){
-    if(act("space") && dueCards(1).length) queue.push("space");
-    pushIf("drawit");
-    const extra=["tryfirst","tellme","teach","concrete","elaborate","mapit","palace","crackword","mixit"].find(id=>act(id) && !queue.includes(id));
-    if(extra) queue.push(extra);
-  } else {
-    if(act("space") && dueCards(1).length) queue.push("space");
-    else if(act("drawit")) queue.push("drawit");
-    else { const e=["tellme","teach"].find(id=>act(id) && !queue.includes(id)); if(e) queue.push(e); }
-  }
-  if(!queue.length) queue.push("braindump");
-  S.sess={ mode, topic, items:freshItems.slice(), queue, idx:0, beat:"read", results:[],
-           guess:null, cover:new Set(), qIdx:0, qMarks:[], reflectText:"", showAnswer:false };
-  go("session");
-}
-
-/* ------------------------------ SESSION ---------------------------- */
-function Session(){
-  const ss=S.sess; const m=moveById(ss.queue[ss.idx]);
-  const s=div("scr");
-  // minimal progress dots
-  const dots=div(); dots.style.cssText="display:flex;gap:6px;padding-top:20px";
-  ss.queue.forEach((q,i)=>{ const d=div(); d.style.cssText=`height:3px;flex:1;border-radius:3px;background:${i<ss.idx?'var(--now)':i===ss.idx?'var(--ink-dim)':'var(--line)'}`; dots.appendChild(d); });
-  s.appendChild(dots);
-
-  if(ss.beat==="read") return readBeat(s,m,ss);
-  if(ss.beat==="do") return doBeat(s,m,ss);
-  if(ss.beat==="reveal") return revealBeat(s,m,ss);
-  if(ss.beat==="muddiest") return muddiestBeat(s);
-  return s;
-}
-
-function readBeat(s,m,ss){
-  s.appendChild(div(null,`<div style="margin-top:30px"><div class="eyebrow mb-s">${m.name}</div>
-    <div class="prompt">${m.read(ss.topic)}</div></div>`));
-  // the bet
-  if(m.bet!=="none"){
-    const bb=div("betbox"); bb.style.marginTop="32px";
-    bb.appendChild(div("field-lab center", m.betq||"How confident are you?"));
-    if(m.bet==="count" || m.bet==="countN"){
-      const max = m.bet==="countN" ? Math.max(1,ss.items.length) : 12;
-      ss.guess = ss.guess==null ? Math.min(3,max) : ss.guess;
-      const st=div("stepper");
-      const minus=document.createElement("button"); minus.textContent="–";
-      const val=div("val"); val.textContent=ss.guess;
-      const plus=document.createElement("button"); plus.textContent="+";
-      minus.onclick=()=>{ ss.guess=Math.max(0,ss.guess-1); val.textContent=ss.guess; };
-      plus.onclick=()=>{ ss.guess=Math.min(max,ss.guess+1); val.textContent=ss.guess; };
-      st.appendChild(minus); st.appendChild(val); st.appendChild(plus); bb.appendChild(st);
-      if(m.bet==="countN") bb.appendChild(div("faint center",`out of ${max}`));
-    } else { // scale 1-5
-      ss.guess = ss.guess==null ? 3 : ss.guess;
-      const sc=div("scale");
-      for(let i=1;i<=5;i++){ const b=document.createElement("button"); b.textContent=i; b.setAttribute("aria-pressed", i===ss.guess);
-        b.onclick=()=>{ ss.guess=i; [...sc.children].forEach((c,j)=>c.setAttribute("aria-pressed", j+1===i)); }; sc.appendChild(b); }
-      bb.appendChild(sc);
-      const ends=div("scale-ends"); ends.style.width="290px"; ends.innerHTML=`<span>no clue</span><span>easy</span>`; bb.appendChild(ends);
-    }
-    s.appendChild(bb);
-  } else { ss.guess=null; }
-
-  s.appendChild(div("spacer"));
-  const b=div("btn btn-primary"); b.textContent="Start"; b.onclick=()=>{ ss.beat="do"; render(); };
-  s.appendChild(b);
-  return s;
-}
-
-/* -- DO -- */
-function doBeat(s,m,ss){
-  if(m.kind==="cued") return doCued(s,m,ss);
-  // free / reflect: timed, output on paper or in the box
-  const ring=makeRing(m.timer);
-  const wrap=div("ringwrap"); wrap.style.marginTop="6px";
-  wrap.appendChild(div("center muted",`<div style="max-width:30ch;margin-bottom:18px;font-size:16px">${m.doi||m.what}</div>`));
-  wrap.appendChild(ring.el);
-  s.appendChild(wrap);
-
-  // capture options (same for everyone): type or speak for brain dump, sketch for paper-based moves
-  const isSketchMove = (m.id==="drawit" || m.id==="mapit" || m.id==="palace" || m.id==="crackword");
-  if(m.id==="braindump"){
-    const cap=div(); cap.style.marginTop="14px";
-    const ta=document.createElement("textarea"); ta.placeholder="Type what you remember… (or write on paper and tick it off after)";
-    cap.appendChild(ta); ss._ta=ta;
-    const mr=div(); mr.style.marginTop="10px"; mr.appendChild(voiceButton(ta,"Speak it")); cap.appendChild(mr);
-    const sk=div(); sk.style.marginTop="8px"; sk.appendChild(sketchCapture(ss,"Or snap your paper")); cap.appendChild(sk);
-    s.appendChild(cap);
-  } else if(isSketchMove){
-    const cap=div(); cap.style.marginTop="16px"; cap.style.display="flex"; cap.style.flexDirection="column"; cap.style.alignItems="center";
-    cap.appendChild(sketchCapture(ss, "Snap your sketch"));
-    cap.appendChild(div("faint center",`<div style="margin-top:8px;font-size:13px">Or just keep it on paper. The book stays closed.</div>`));
-    s.appendChild(cap);
-  } else {
-    s.appendChild(div("note center",`<div style="margin-top:18px;border:none">Do it on paper. The book stays closed.</div>`));
-  }
-
-  s.appendChild(div("spacer"));
-  const done=div("btn btn-primary"); done.textContent="Done";
-  done.onclick=()=>{ ring.stop(); ss.beat="reveal"; render(); };
-  s.appendChild(done);
-  ring.start();
-  return s;
-}
-
-/* sketch capture: photograph paper work, preview in-memory (not persisted) */
-function sketchCapture(ss, label){
-  const wrap=div();
-  const inp=document.createElement("input"); inp.type="file"; inp.accept="image/*"; inp.capture="environment"; inp.style.display="none";
-  const btn=div("btn btn-ghost"); btn.style.width="auto"; btn.style.display="inline-flex"; btn.style.gap="9px";
-  btn.innerHTML=`<span style="font-size:18px">✎</span> ${label}`;
-  const prev=div(); prev.style.marginTop="12px";
-  btn.onclick=()=>inp.click();
-  inp.onchange=()=>{ const f=inp.files&&inp.files[0]; if(!f) return; const url=URL.createObjectURL(f);
-    prev.innerHTML=`<img src="${url}" alt="your sketch" style="max-width:100%;border-radius:13px;border:1px solid var(--line-2)">`;
-    btn.innerHTML=`<span style="font-size:18px">✎</span> Retake`; ss._sketched=true; };
-  wrap.appendChild(inp); wrap.appendChild(btn); wrap.appendChild(prev);
-  return wrap;
-}
-
-function doCued(s,m,ss){
-  const items = m.id==="space" ? cardItems(dueCards(Math.max(3,ss.items.length))) : ss.items;
-  ss._items = items;
-  if(!items.length){ // nothing to review
-    s.appendChild(div(null,`<div style="margin-top:40px" class="prompt">Nothing's due to come back yet.</div>`));
-    s.appendChild(div("lede mt","That's spacing working. Keep going, it'll fill up."));
-    s.appendChild(div("spacer"));
-    const b=div("btn btn-primary"); b.textContent="Next"; b.onclick=()=>advanceMove(ss); s.appendChild(b); return s;
-  }
-  const it=items[ss.qIdx];
-  s.appendChild(div(null,`<div style="margin-top:26px"></div>`));
-  const card=div("qcard");
-  card.innerHTML=`<div class="qnum">Question ${ss.qIdx+1} of ${items.length}</div><div class="qtext">${it.q}</div>`;
-  if(ss.showAnswer){
-    const an=div("answer"); an.innerHTML=`<span class="alab">Answer</span>${it.a}`; card.appendChild(an);
-  }
-  s.appendChild(card);
-
-  if(!ss.showAnswer){
-    const aBox=document.createElement("textarea"); aBox.placeholder="Your answer (out loud is fine too)"; aBox.style.marginTop="12px"; aBox.style.minHeight="80px";
-    s.appendChild(aBox);
-    const mr=div(); mr.style.marginTop="10px"; mr.appendChild(voiceButton(aBox,"Speak")); s.appendChild(mr);
-    s.appendChild(div("spacer"));
-    const show=div("btn btn-ghost"); show.textContent="Show answer"; show.onclick=()=>{ ss.showAnswer=true; render(); };
-    s.appendChild(show);
-  } else {
-    s.appendChild(div("spacer"));
-    s.appendChild(div("field-lab center","Did you get it?"));
-    const row=div("row"); row.style.marginTop="4px";
-    const got=div("btn btn-quiet"); got.textContent="Got it"; got.style.color="var(--good)";
-    const miss=div("btn btn-quiet"); miss.textContent="Missed it";
-    got.onclick=()=>markCued(ss,it,true); miss.onclick=()=>markCued(ss,it,false);
-    row.appendChild(miss); row.appendChild(got); s.appendChild(row);
-  }
-  return s;
-}
-function markCued(ss,it,correct){
-  ss.qMarks.push(correct);
-  if(it._card) sm2(it._card, correct?5:2);
-  ss.showAnswer=false; ss.qIdx++;
-  if(ss.qIdx>=ss._items.length){ save(); ss.beat="reveal"; }
-  render();
-}
-function cardItems(cards){ return cards.map(c=>({q:c.q,a:c.a,_card:c})); }
-
-/* -- REVEAL -- */
-function revealBeat(s,m,ss){
-  let got=0, max=1;
-  if(m.kind==="cued"){
-    got=ss.qMarks.filter(Boolean).length; max=Math.max(1,ss._items.length);
-    s.appendChild(div(null,`<div style="margin-top:30px"><div class="eyebrow mb-s">${m.name}</div>
-      <div class="prompt">You got ${got} of ${max}.</div></div>`));
-    s.appendChild(gapViz(ss.guess, got, max));
-    recordGap(ss.guess/max, got/max);
-  } else if(m.kind==="free"){ // braindump coverage check
-    s.appendChild(div(null,`<div style="margin-top:26px"><div class="eyebrow mb-s">${m.name}</div>
-      <div class="prompt">${m.cover||"Tick what you covered."}</div></div>`));
-    const chips=div("chips"); chips.style.marginTop="16px";
-    ss.items.forEach((it,i)=>{
-      const c=div("cov"); c.textContent=it.q.replace(/_____/g,"___"); c.setAttribute("aria-pressed", ss.cover.has(i));
-      c.onclick=()=>{ ss.cover.has(i)?ss.cover.delete(i):ss.cover.add(i); c.setAttribute("aria-pressed", ss.cover.has(i)); updGap(); };
-      chips.appendChild(c);
-    });
-    s.appendChild(chips);
-    got=ss.cover.size; max=Math.max(1,ss.items.length);
-    const gv=gapViz(ss.guess, got, max); gv.id="gv"; s.appendChild(gv);
-    function updGap(){ const g=document.getElementById("gv"); const nv=gapViz(ss.guess, ss.cover.size, max); nv.id="gv"; g.replaceWith(nv); }
-  } else { // reflect: name the gap, effort only
-    s.appendChild(div(null,`<div style="margin-top:30px"><div class="eyebrow mb-s">${m.name}</div>
-      <div class="prompt">${m.reflectq||"What was the gap?"}</div></div>`));
-    const ta=document.createElement("textarea"); ta.placeholder="Name the part you couldn't do. That's tomorrow's start."; ta.style.marginTop="16px";
-    s.appendChild(ta);
-    const mr=div(); mr.style.marginTop="10px"; mr.appendChild(voiceButton(ta,"Speak")); s.appendChild(mr); ss._reflect=ta;
-  }
-
-  // effort + missed note
-  if(m.kind==="free"){
-    const miss=div("note"); miss.style.marginTop="14px";
-    miss.innerHTML="Whatever you left unticked is the bit to hit next time. Not a fail, just the next turn.";
-    s.appendChild(miss);
-  }
-  s.appendChild(div("spacer"));
-  s.appendChild(div("field-lab center","How hard did that feel?"));
-  const eff=div("scale"); eff.style.justifyContent="center"; eff.style.marginBottom="14px";
-  ["Easy","OK","Hard"].forEach((lab,i)=>{ const b=document.createElement("button"); b.textContent=lab; b.style.width="92px"; b.style.fontFamily="var(--ui)"; b.style.fontSize="14px";
-    b.onclick=()=>{ ss._effort=i+1; [...eff.children].forEach((c,j)=>c.setAttribute("aria-pressed",j===i)); }; eff.appendChild(b); });
-  s.appendChild(eff);
-
-  const next=div("btn btn-primary"); next.textContent = (ss.idx>=ss.queue.length-1)?"Last thing":"Next move";
-  next.onclick=()=>{
-    if(m.kind==="free"){ // SM-2 from coverage
-      ss.items.forEach((it,i)=>{ const card=P().cards.find(c=>c.q===it.q); if(card) sm2(card, ss.cover.has(i)?5:2); });
-      recordGapFinal(ss.guess, ss.cover.size, Math.max(1,ss.items.length));
-      save();
-    }
-    advanceMove(ss);
-  };
-  s.appendChild(next);
-  return s;
-}
-
-function advanceMove(ss){
-  ss.results.push({ move:ss.queue[ss.idx], effort:ss._effort||null });
-  ss.idx++; ss.beat="read"; ss.guess=null; ss.cover=new Set(); ss.qIdx=0; ss.qMarks=[]; ss.showAnswer=false; ss._effort=null;
-  if(ss.idx>=ss.queue.length){ ss.beat="muddiest"; }
-  render();
-}
-
-/* -- MUDDIEST POINT -- */
-function muddiestBeat(s){
-  s.appendChild(div(null,`<div style="margin-top:32px"><div class="eyebrow mb-s">One thing before you close</div>
-    <div class="prompt">What's still fuzzy?</div></div>`));
-  s.appendChild(div("lede mt","The part you'd struggle to explain. It comes back first next time."));
-  const ta=document.createElement("textarea"); ta.placeholder="Type or say the murky bit…"; ta.style.marginTop="18px";
-  s.appendChild(ta);
-  const mr=div(); mr.style.marginTop="10px"; mr.appendChild(voiceButton(ta,"Speak it")); s.appendChild(mr);
-  s.appendChild(div("spacer"));
-  const b=div("btn btn-primary"); b.textContent="Finish session";
-  b.onclick=()=>{ if(ta.value.trim()) P().muddiest.unshift({t:Date.now(), text:ta.value.trim(), topic:(S.sess&&S.sess.topic)||""}); endSession(); };
-  s.appendChild(b);
-  const skip=div("tlink center"); skip.style.marginTop="12px"; skip.textContent="Nothing fuzzy, skip"; skip.onclick=endSession;
-  s.appendChild(skip);
-  return s;
-}
-
-function endSession(){
-  const ss=S.sess;
-  const gaps=ss.results.length;
-  P().sessions.push({ t:Date.now(), moves:ss.queue.length });
-  save();
-  go("summary");
-}
-
-/* ----------------------------- SUMMARY ----------------------------- */
-function Summary(){
-  const s=div("scr"); s.appendChild(topbar(false));
-  const ss=S.sess||{queue:[]};
-  s.appendChild(div(null,`<div style="margin-top:30px"><div class="eyebrow mb-s">Done</div>
-    <h1 class="display">${ss.queue.length} move${ss.queue.length!==1?"s":""}, on your work.</h1></div>`));
-
-  // gap trend (her language)
-  const hist=P().gapHistory.slice(-12);
-  if(hist.length>=2){
-    const lastGap=Math.round((1-hist[hist.length-1].gap)*100);
-    s.appendChild(div("mt",`<div class="field-lab">How close your guesses are getting</div>`));
-    const sp=div("spark");
-    hist.forEach((h,i)=>{ const b=div("bar"+(i===hist.length-1?" last":"")); const closeness=Math.max(.08,1-h.gap); b.style.height=(closeness*100)+"%"; sp.appendChild(b); });
-    s.appendChild(sp);
-    s.appendChild(div("sub",`Closer is better. You're reading yourself ${trendWord(hist)}.`));
-  } else if(hist.length===1){
-    s.appendChild(div("note mt","First data point logged. The trend shows up once you've done a few."));
-  }
-
-  // carry forward: the muddiest point just named becomes tomorrow's opening (Lovett)
-  const freshMud = (P().muddiest[0] && (Date.now()-P().muddiest[0].t < 3600000)) ? P().muddiest[0].text : null;
-  const topic = ss.topic || "this";
-  if(freshMud){
-    s.appendChild(div("mt",`<div class="field-lab">Carrying forward</div>`));
-    s.appendChild(div("rowcard",`<div class="rd" style="margin:0">You flagged <b style="color:var(--ink)">${freshMud}</b>. That's where you start next time, not the easy stuff.</div>`));
-  }
-
-  // one if-then plan for next time (implementation intention, built locally, not a model call)
-  const shortMud = freshMud ? (freshMud.length>44 ? freshMud.slice(0,44).trim()+"…" : freshMud) : null;
-  const plan = shortMud
-    ? `When you next open ${topic}, start with ${shortMud} before anything else.`
-    : `When you next sit down with ${topic}, close the book and dump what you remember before you read a thing.`;
-  s.appendChild(div("mt",`<div class="field-lab">Your plan for next time</div>`));
-  s.appendChild(div("rowcard",`<div style="margin:0;font-family:var(--display);font-size:20px;line-height:1.3;color:var(--ink)">${plan}</div>`));
-
-  // graduation nudge (retirement is the manual button in the moves map, not auto-detected)
-  s.appendChild(div("spacer"));
-  const grad=MOVES.filter(m=>P().moves[m.id].status==="active").length;
-  s.appendChild(div("center faint",`<div style="font-size:13px;margin-bottom:14px">${grad} move${grad!==1?"s":""} still being coached. When you catch yourself running one without the app asking, retire it yourself in the moves map.</div>`));
-  const b=div("btn btn-primary"); b.textContent="Back to start"; b.onclick=()=>go("home"); s.appendChild(b);
-  return s;
-}
-function trendWord(h){ if(h.length<3) return "more each time"; const a=h.slice(0,Math.ceil(h.length/2)).reduce((x,y)=>x+y.gap,0); const b=h.slice(Math.ceil(h.length/2)).reduce((x,y)=>x+y.gap,0); return b<a?"better":"steadily"; }
-
-/* ------------------------- GAP RECORDING --------------------------- */
-function recordGap(gFrac, rFrac){ /* placeholder used by cued; final write below */ }
-function recordGapFinal(guess, got, max){
-  const gap = Math.abs((guess/max)-(got/max));
-  P().gapHistory.push({ t:Date.now(), gap });
-}
-// cued path records on reveal entry:
-(function(){ const _r=recordGap; recordGap=function(gFrac,rFrac){ P().gapHistory.push({t:Date.now(), gap:Math.abs(gFrac-rFrac)}); save(); }; })();
-
-/* ------------------------------ GAP VIZ ---------------------------- */
-function gapViz(guess, got, max){
-  const g=div("gap");
-  const track=div("gaptrack");
-  const gp = max? (guess/max):0, rp = max? (got/max):0;
-  const gPin=div("pin g"); gPin.style.left=(gp*100)+"%";
-  const rPin=div("pin r"); rPin.style.left=(rp*100)+"%";
-  const gl=div("pinlab g"); gl.style.left=(gp*100)+"%"; gl.innerHTML=`guessed <span class="gapnum">${guess}</span>`;
-  const rl=div("pinlab r"); rl.style.left=(rp*100)+"%"; rl.innerHTML=`<span class="gapnum">${got}</span> got`;
-  track.appendChild(gPin); track.appendChild(rPin); track.appendChild(gl); track.appendChild(rl);
-  g.appendChild(track);
-  const diff=Math.abs(guess-got);
-  const msg = diff===0 ? "Dead on. You know what you know." : diff<=1 ? "Close. Your gut's getting accurate." : guess>got ? "You thought you had more. That gap is the fluency illusion, now you've seen it." : "You had more than you thought. Bank that.";
-  g.appendChild(div("sub center",`<div style="margin-top:4px">${msg}</div>`));
-  return g;
-}
-
-/* ------------------------------ RING ------------------------------- */
-function makeRing(seconds){
-  const R=116, C=2*Math.PI*R;
-  const el=div("ring");
-  el.innerHTML=`<svg width="248" height="248" viewBox="0 0 248 248">
-    <circle class="track" cx="124" cy="124" r="${R}"></circle>
-    <circle class="arc" cx="124" cy="124" r="${R}" stroke-dasharray="${C}" stroke-dashoffset="0"></circle></svg>
-    <div class="mid"><div class="time">${fmt(seconds)}</div><div class="midlab">on paper</div></div>`;
-  const arc=el.querySelector(".arc"); const time=el.querySelector(".time");
-  let raf=null, start=null, dur=seconds*1000, stopped=false;
-  function frame(ts){ if(stopped) return; if(!start) start=ts; const e=ts-start; const left=Math.max(0,dur-e);
-    const frac=Math.min(1,e/dur); arc.style.strokeDashoffset=(C*frac); time.textContent=fmt(Math.ceil(left/1000));
-    if(left<=0){ arc.style.stroke="var(--ink-dim)"; el.querySelector(".midlab").textContent="take your time"; return; }
-    raf=requestAnimationFrame(frame); }
-  return { el, start:()=>{ raf=requestAnimationFrame(frame); }, stop:()=>{ stopped=true; if(raf)cancelAnimationFrame(raf); } };
-}
-function fmt(s){ s=Math.max(0,s); const m=Math.floor(s/60), x=s%60; return m+":"+String(x).padStart(2,"0"); }
-
-/* ------------------------------ VOICE ------------------------------ */
-function voiceButton(target, label){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  const b=div("mic"); b.innerHTML=`<span class="pulse"></span>${label}`;
-  if(!SR){ b.style.opacity=".4"; b.title="Voice not supported in this browser"; b.onclick=()=>toast("This browser doesn't do voice. Typing works."); return b; }
-  let rec=null, on=false;
-  b.onclick=()=>{
-    if(on){ rec&&rec.stop(); return; }
-    rec=new SR(); rec.continuous=true; rec.interimResults=false; rec.lang="en-US";
-    rec.onresult=e=>{ let t=""; for(let i=e.resultIndex;i<e.results.length;i++) t+=e.results[i][0].transcript; target.value=(target.value?target.value+" ":"")+t.trim(); };
-    rec.onend=()=>{ on=false; b.setAttribute("aria-pressed",false); };
-    rec.onerror=()=>{ on=false; b.setAttribute("aria-pressed",false); };
-    rec.start(); on=true; b.setAttribute("aria-pressed",true);
-  };
-  return b;
-}
-
-/* --------------------------- MATERIAL (her shelf) ---------------------------
-   Browse every topic she has run, the items generated from it, and the
-   muddiest-point log. Nothing graded. Reads straight from saved cards. */
-function Material(){
-  const s=div("scr"); s.appendChild(topbar(false));
-  const p=P(); const t=today();
-  s.appendChild(div("boardhead",`<div class="eyebrow mb-s">Your material</div>
-    <h1 class="display">Everything you've run.</h1>
-    <div class="note mt">Every topic you've studied, the questions built from it, and what you flagged as fuzzy. Nothing here is graded. It's yours to come back to.</div>`));
-
-  if(!p.cards.length){
-    s.appendChild(div("lede mt","Nothing here yet. Run a session and your topics show up, ready to bring back."));
-    s.appendChild(div("spacer"));
-    const b=div("btn btn-primary"); b.textContent="Start a session"; b.onclick=()=>go("home"); s.appendChild(b);
-    return s;
-  }
-
-  // group cards by topic, newest first
-  const groups={};
-  p.cards.forEach(c=>{ const k=c.topic && c.topic.trim() ? c.topic.trim() : "Earlier sessions"; (groups[k]=groups[k]||[]).push(c); });
-  const order=Object.keys(groups).sort((a,b)=>{
-    const bornA=Math.max.apply(null, groups[a].map(c=>c.born));
-    const bornB=Math.max.apply(null, groups[b].map(c=>c.born));
-    return bornB-bornA;
-  });
-
-  s.appendChild(div("section-lab","Topics"));
-  order.forEach(name=>{
-    const cards=groups[name];
-    const due=cards.filter(c=>c.due<=t).length;
-    const settling=cards.filter(c=>c.interval>=7).length; // scheduled a week+ out
-    const nextDue=Math.min.apply(null, cards.map(c=>c.due-t));
-    const det=document.createElement("details"); det.className="rowcard";
-    const sub = due
-      ? `${due} ready to bring back`
-      : `next one comes back in ${Math.max(0,nextDue)} day${nextDue===1?"":"s"}`;
-    det.innerHTML=`<summary><div class="rowhead"><div class="rt">${name}</div>
-      <span class="tag ${due?'active':'dud'}">${cards.length} item${cards.length!==1?"s":""}</span></div>
-      <div class="rd">${sub}${settling?` \u00b7 ${settling} settling in`:""}</div></summary>`;
-    const body=div(); body.style.marginTop="12px";
-    cards.forEach(c=>{
-      const item=div(); item.style.cssText="padding:11px 0;border-top:1px solid var(--line)";
-      item.innerHTML=`<div style="font-family:var(--display);font-size:18px;line-height:1.25">${c.q.replace(/_____/g,"___")}</div>
-        <div style="color:var(--good);font-size:14px;margin-top:5px">${c.a}</div>`;
-      body.appendChild(item);
-    });
-    det.appendChild(body);
-    s.appendChild(det);
-  });
-
-  // muddiest log
-  if(p.muddiest && p.muddiest.length){
-    s.appendChild(div("section-lab","What you've flagged as fuzzy"));
-    p.muddiest.slice(0,12).forEach(mud=>{
-      const row=div("rowcard");
-      const ds=new Date(mud.t).toLocaleDateString(undefined,{month:"short",day:"numeric"});
-      const where = mud.topic && mud.topic.trim() ? ` \u00b7 ${mud.topic.trim()}` : "";
-      row.innerHTML=`<div class="rd" style="margin:0"><span class="faint" style="font-size:12px">${ds}${where}</span><br>${mud.text}</div>`;
-      s.appendChild(row);
-    });
-  }
-
-  s.appendChild(div("spacer"));
-  const b=div("btn btn-ghost mt"); b.textContent="Back"; b.style.maxWidth="320px"; b.onclick=()=>go("home"); s.appendChild(b);
-  return s;
-}
-
-/* ----------------------------- LIBRARY (transit map) ----------------------------- */
-function Library(){
-  const s=div("scr"); s.appendChild(topbar(false));
-  s.appendChild(div("boardhead",`<div class="eyebrow mb-s">The network</div>
-    <h1 class="display">The lines.</h1>
-    <div class="note mt">Each line is a different journey. Stations are moves. Every line changes at <b>Guess First</b>, and every material line ends at <b>Muddiest Point</b>. Tap a station to read it.</div>`));
-
-  const WRAP={
-    "Guess First":{desc:"Before any recall move, call your shot: predict how much you'll get, then find out. The gap between guess and got is the whole game.", src:"Make It Stick (calibration)"},
-    "Muddiest Point":{desc:"Before you close, name the one thing still fuzzy. It comes back first next time.", src:"Range (Lovett) \u00b7 Neuroteach (exit ticket)"},
-  };
-  function libItem(name){
-    const m=MOVES.find(x=>x.name===name); if(m){ const st=P().moves[m.id]&&P().moves[m.id].status; return {desc:m.what, src:m.source, status:st, id:m.id}; }
-    const e=LIBRARY.extraMoves.find(x=>x.name===name); if(e) return {desc:e.line, src:e.src};
-    const w=LIBRARY.why.find(x=>x.name===name); if(w) return {desc:w.line, src:w.src};
-    const x=EXCLUDED.find(z=>z.name===name); if(x) return {desc:x.body, src:"Do this instead: "+x.instead+"."};
-    return WRAP[name] || {desc:"",src:""};
-  }
-
-  const HEX={learn:"#4F46E5", keep:"#2E6FA6", exam:"#3F8452", unstuck:"#8A5BB0", node:"#1A1D23"};
-  const LINE={
-    learn:{name:"Learn It", desc:"New material, start to finish. Guess, take a swing before you\u2019ve studied, turn it into your own picture, pull it back cold."},
-    keep:{name:"Keep It", desc:"Bring old material back after a gap so it sticks. A short line: guess, space it, review, out."},
-    exam:{name:"Exam", desc:"Get ready for a test. Mix the types, hard-start the hard one, learn from the postmortem."},
-    unstuck:{name:"Unstuck", desc:"When you can\u2019t start or you stall. It runs from the door to Guess First, where the learning lines begin."},
-  };
-  const ORDER=[
-    ["Get Started","unstuck"],["Plan It","unstuck"],["Find the Hook","unstuck"],["Set a Process Goal","unstuck"],
-    ["Study Somewhere New","unstuck"],["Sprint and Break","unstuck"],["Walk It Off","unstuck"],["Steady the Nerves","unstuck"],
-    ["Guess First","xchg"],
-    ["Space It Out","keep"],["Review As You Learn","keep"],
-    ["Mix It","exam"],["Hard-Start (exams)","exam"],["Exam Postmortem","exam"],
-    ["Try It First","learn"],["Draw It","learn"],["Sketchnote","learn"],["Map It","learn"],["Build a Palace","learn"],
-    ["Crack the Word","learn"],["Chunk It","learn"],["Brain Dump","learn"],["Tell Me Without Looking","learn"],
-    ["Teach It Dumber","learn"],["Self-Explain","learn"],["Use an Analogy","learn"],["Make It Concrete","learn"],["Elaborate","learn"],
-    ["Muddiest Point","term"],
+/* ---------- responsive sizing: one number drives geometry and type ---------- */
+const stage=document.getElementById("stage");
+const cubeF=document.getElementById("cubeF"), cubeT=document.getElementById("cubeT");
+let SZ=280, FACE_TF=[];
+function sizeCube(){
+  const r=stage.getBoundingClientRect();
+  /* face-on the cube fits with margin; mid-drag corners may kiss the edges, which reads fine */
+  SZ=Math.round(Math.max(190, Math.min(310, (r.width-28)/1.42, (r.height-20)*0.52)));
+  stage.style.perspective=(SZ*4.7)+"px";
+  const h=SZ/2;
+  FACE_TF=[
+    `translateZ(${h}px)`,`rotateY(90deg) translateZ(${h}px)`,`rotateY(-90deg) translateZ(${h}px)`,
+    `rotateX(90deg) translateZ(${h}px)`,`rotateX(-90deg) translateZ(${h}px)`,`rotateY(180deg) translateZ(${h}px)`
   ];
-  const rowOf={}; ORDER.forEach((r,i)=>rowOf[r[0]]=i);
-  const N=ORDER.length, rowH=46, y0=30, SPINE=44, KEEP=74, EXAM=104, LX=126;
-  const yOf=i=>y0+i*rowH, H=y0+(N-1)*rowH+34;
-  const gf=rowOf["Guess First"], mp=rowOf["Muddiest Point"];
-  const laneX={unstuck:SPINE, learn:SPINE, xchg:SPINE, term:SPINE, keep:KEEP, exam:EXAM};
-
-  const strokes=[];
-  strokes.push(`<line x1="${SPINE}" y1="${yOf(0)}" x2="${SPINE}" y2="${yOf(gf)}" stroke="${HEX.unstuck}" stroke-width="4" stroke-linecap="round"/>`);
-  strokes.push(`<line x1="${SPINE}" y1="${yOf(gf)}" x2="${SPINE}" y2="${yOf(mp)}" stroke="${HEX.learn}" stroke-width="4" stroke-linecap="round"/>`);
-  strokes.push(`<path d="M ${SPINE} ${yOf(gf)} C ${SPINE} ${yOf(gf)+20}, ${KEEP} ${yOf(rowOf["Space It Out"])-20}, ${KEEP} ${yOf(rowOf["Space It Out"])} L ${KEEP} ${yOf(rowOf["Review As You Learn"])} L ${KEEP} ${yOf(mp)-24} C ${KEEP} ${yOf(mp)-6}, ${SPINE} ${yOf(mp)-12}, ${SPINE} ${yOf(mp)}" fill="none" stroke="${HEX.keep}" stroke-width="4" stroke-linecap="round"/>`);
-  strokes.push(`<path d="M ${SPINE} ${yOf(gf)} C ${SPINE} ${yOf(gf)+20}, ${EXAM} ${yOf(rowOf["Mix It"])-20}, ${EXAM} ${yOf(rowOf["Mix It"])} L ${EXAM} ${yOf(rowOf["Exam Postmortem"])} L ${EXAM} ${yOf(mp)-28} C ${EXAM} ${yOf(mp)-6}, ${SPINE} ${yOf(mp)-14}, ${SPINE} ${yOf(mp)}" fill="none" stroke="${HEX.exam}" stroke-width="4" stroke-linecap="round"/>`);
-
-  const dots=[], labels=[], hits=[], pos={};
-  ORDER.forEach((r,i)=>{
-    const name=r[0], lane=r[1], x=laneX[lane], y=yOf(i); pos[name]=[x,y];
-    const big=(lane==="xchg"||lane==="term"), col=big?HEX.node:HEX[lane];
-    if(big){ dots.push(`<circle cx="${x}" cy="${y}" r="9" fill="#FFFFFF" stroke="${HEX.node}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="3.4" fill="${HEX.node}"/>`); }
-    else { dots.push(`<circle cx="${x}" cy="${y}" r="5.5" fill="#FFFFFF" stroke="${col}" stroke-width="3"/>`); }
-    const it=libItem(name), retired=it.status==="graduated";
-    const sub = lane==="xchg" ? "interchange \u00b7 every line" : lane==="term" ? "terminus \u00b7 all lines end" : "";
-    labels.push(`<text x="${LX}" y="${sub?y-2:y+4.5}" fill="${big?HEX.node:'#1A1D23'}" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="${big?600:450}"${retired?' opacity="0.45"':''}>${name}${retired?'  \u2713':''}</text>`);
-    if(sub) labels.push(`<text x="${LX}" y="${y+13}" fill="#5E636E" font-family="Inter,system-ui,sans-serif" font-size="10.5" letter-spacing="0.4">${sub}</text>`);
-    hits.push(`<rect class="thit" data-st="${name}" x="0" y="${y-rowH/2}" width="360" height="${rowH}" fill="transparent"/>`);
+  [cubeF,cubeT].forEach(c=>{
+    c.style.setProperty("--sz",SZ+"px");
+    c.style.fontSize=(SZ/280*16)+"px";
+    [...c.children].forEach((f,i)=>f.style.transform=FACE_TF[i]);
   });
-  const halo=`<circle id="thalo" cx="-99" cy="-99" r="12" fill="none" stroke="#1A1D23" stroke-width="2"/>`;
-  const svg=`<svg viewBox="0 0 360 ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MOVE lines and stations">${strokes.join("")}${halo}${dots.join("")}${labels.join("")}${hits.join("")}</svg>`;
-  const mapWrap=div("tmap"); mapWrap.innerHTML=svg; s.appendChild(mapWrap);
+}
 
-  const laneName={unstuck:"Unstuck line", keep:"Keep It line", exam:"Exam line", learn:"Learn It line", xchg:"Interchange \u00b7 every line", term:"Terminus \u00b7 every line ends here"};
-  const laneOf={}; ORDER.forEach(r=>laneOf[r[0]]=r[1]);
+/* ---------- build level-1 (families) cube ---------- */
+FAM.forEach((fam,ci)=>{
+  const face=document.createElement("div"); face.className="face fam"+(ci===0?" startface":"");
+  face.style.background=fam.c; face.style.color=inkFor(fam.c);
+  const count=T.filter(t=>t.fam.includes(ci)).length;
+  const startPill=ci===0?`<div class="startpill"><span class="pdot"></span>START HERE</div>`:"";
+  face.innerHTML=`${startPill}<div><div class="fnum">Family ${ci+1} · ${count} techniques</div>
+    <div class="fnm">${fam.n}</div><div class="fbl">${fam.bl}</div></div>
+    <div class="fopen">Tap to open &rarr;</div>`;
+  face.addEventListener("click",()=>{ if(moved) return; openFamily(ci); });
+  cubeF.appendChild(face);
+});
 
-  const sheet=div("sheet"); sheet.id="stationSheet"; s.appendChild(sheet);
-  function closeSheet(){ sheet.classList.remove("show"); const h=mapWrap.querySelector("#thalo"); if(h){h.setAttribute("cx","-99");h.setAttribute("cy","-99");} }
-  function openStation(name){
-    const it=libItem(name); const lane=laneOf[name];
-    let lineLabel, col;
-    if(!lane){
-      if(LIBRARY.why.find(w=>w.name===name)){ lineLabel="Why it works"; col="#2E6FA6"; }
-      else if(EXCLUDED.find(x=>x.name===name)){ lineLabel="Not on the map"; col="#565C68"; }
-      else { lineLabel=""; col=HEX.learn; }
-    } else { lineLabel=laneName[lane]; col=(lane==="xchg"||lane==="term")?HEX.node:(HEX[lane]||HEX.learn); }
-    sheet.innerHTML=`<div class="sheet-top"><div><div class="sheet-nm">${name}</div>
-      <div class="sheet-line" style="color:${col}">${lineLabel}</div></div>
-      <button class="sheet-x" aria-label="Close">\u2715</button></div>
-      <div class="sheet-desc">${it.desc||""}${it.src?`<span class="sheet-src">${it.src}</span>`:""}</div>`;
-    sheet.querySelector(".sheet-x").onclick=closeSheet;
-    const mv=MOVES.find(x=>x.name===name);
-    if(mv && P().moves[mv.id] && P().moves[mv.id].status==="active"){
-      const rb=document.createElement("button"); rb.className="retire"; rb.style.marginTop="15px";
-      rb.textContent="I run this on my own now";
-      rb.onclick=()=>{ const ms=P().moves[mv.id]; ms.unprompted=(ms.unprompted||0)+1;
-        if(ms.unprompted>=2){ ms.status="graduated"; save(); celebrate(mv); return; }
-        save(); toast(`Noted. One more time on your own and ${mv.name} retires.`); closeSheet(); render(); };
-      sheet.appendChild(rb);
+/* legend + pager dots */
+const legend=document.getElementById("legend");
+FAM.forEach(f=>{ const l=document.createElement("div"); l.className="lg";
+  l.innerHTML=`<span class="sw" style="background:${f.c}"></span>${f.n}`; legend.appendChild(l); });
+const dotsEl=document.getElementById("dots");
+for(let i=0;i<6;i++){ const d=document.createElement("div"); d.className="dot"; dotsEl.appendChild(d); }
+function updateDots(){
+  if(level!=="family"){ dotsEl.classList.add("hide"); return; }
+  dotsEl.classList.remove("hide");
+  const fi=frontFace(rotX,rotY);
+  [...dotsEl.children].forEach((d,i)=>d.classList.toggle("on",i===fi));
+}
+/* which face index is closest to front for a given rotation */
+function frontFace(x,y){
+  const nx=Math.round(x/90)*90, ny=((Math.round(y/90)*90)%360+360)%360;
+  if(nx>=90) return 4;           /* looking at bottom face brought front */
+  if(nx<=-90) return 3;          /* top */
+  return {0:0, 90:2, 180:5, 270:1}[ny];
+}
+
+/* ---------- level-2 (a family's techniques) ---------- */
+function openFamily(ci){
+  const fam=FAM[ci]; curFam=ci;
+  const items=T.filter(t=>t.fam.includes(ci));
+  const first=items[0];
+  cubeT.innerHTML="";
+  const perFace=[[],[],[],[],[],[]];
+  items.forEach((t,i)=>perFace[Math.floor(i/4)].push(t));   /* fill each face before moving on */
+  for(let fi=0; fi<6; fi++){
+    const face=document.createElement("div"); face.className="face";
+    face.style.background=shade(fam.c,0.9); face.style.transform=FACE_TF[fi];
+    const grid=document.createElement("div"); grid.className="tgrid";
+    for(let k=0;k<4;k++){
+      const t=perFace[fi][k];
+      const cell=document.createElement("button");
+      if(t){ cell.className="cell"+(t===first?" startcell":""); cell.style.background=fam.c; cell.style.color=inkFor(fam.c);
+        cell.innerHTML=(t===first?'<span class="stag">START HERE</span>':'')+'<span class="ic">'+svg(ICON[t.n])+'</span>'+t.n;
+        cell.addEventListener("click",()=>{ if(moved) return; openCard(t,ci); });
+      } else { cell.className="cell empty"; cell.style.background=shade(fam.c,0.82); }
+      grid.appendChild(cell);
     }
-    const p=pos[name], h=mapWrap.querySelector("#thalo");
-    if(p&&h){ h.setAttribute("cx",p[0]); h.setAttribute("cy",p[1]); } else if(h){ h.setAttribute("cx","-99"); h.setAttribute("cy","-99"); }
-    sheet.classList.add("show");
+    face.appendChild(grid); cubeT.appendChild(face);
   }
-  mapWrap.querySelectorAll(".thit").forEach(el=>{ el.addEventListener("click",()=>openStation(el.getAttribute("data-st"))); });
-
-  const key=div("tkey"); key.appendChild(div("tkey-h","The lines \u00b7 what each is for"));
-  ["learn","keep","exam","unstuck"].forEach(id=>{
-    const row=div("tkey-line");
-    row.innerHTML=`<span class="tkey-sw" style="background:${HEX[id]}"></span>
-      <div><div class="tkey-nm">${LINE[id].name}</div><div class="tkey-ds">${LINE[id].desc}</div></div>`;
-    key.appendChild(row);
-  });
-  s.appendChild(key);
-
-  const laws=div("tlaws"); laws.appendChild(div("tkey-h","Why the lines work"));
-  laws.appendChild(div("tkey-ds","The physics under the network. Not stations, the reasons the routes run the way they do."));
-  const lc=div("tlaw-chips");
-  LIBRARY.why.forEach(w=>{ const c=document.createElement("button"); c.className="tlaw"; c.textContent=w.name; c.onclick=()=>openStation(w.name); lc.appendChild(c); });
-  laws.appendChild(lc); s.appendChild(laws);
-
-  const skip=div("tskip"); skip.appendChild(div("tskip-h","Not on the map \u00b7 feels like studying, isn\u2019t"));
-  const sc=div("tskip-chips");
-  EXCLUDED.forEach(x=>{ const c=document.createElement("button"); c.className="d"; c.textContent=x.name; c.onclick=()=>openStation(x.name); sc.appendChild(c); });
-  skip.appendChild(sc); s.appendChild(skip);
-
-  const proofNote=div("tskip"); proofNote.style.marginTop="26px";
-  proofNote.appendChild(div("tskip-h","Why believe it"));
-  proofNote.appendChild(div("tkey-ds","None of this is opinion. Every move here beat the usual ones in controlled studies. Test yourself on something once and you remember about twice as much a week later as rereading it. Karpicke and Roediger, Science, 2008."));
-  s.appendChild(proofNote);
-
-  s.appendChild(div("spacer"));
-  const b=div("btn btn-ghost mt"); b.textContent="Back"; b.style.maxWidth="320px"; b.onclick=()=>go("home"); s.appendChild(b);
-  return s;
+  level="family";
+  cubeF.classList.add("hide"); cubeT.classList.remove("hide");
+  legend.classList.add("hide");
+  document.getElementById("hint").textContent="Swipe to turn. Tap a technique for its card.";
+  document.getElementById("hint").classList.remove("fade");
+  setBack(`&larr; All families`); document.getElementById("ctx").textContent=`${fam.n} · ${items.length}`;
+  setRotation(0,0);      /* open face-on: readable immediately */
+  updateDots();
 }
 
-/* graduation (retiring a move once it's automatic) now lives in the Library, as her own call */
-
-
-function celebrate(m){
-  const s=div("scr");
-  s.appendChild(div("spacer"));
-  s.appendChild(div("celebrate",`<div class="big">${m.name}<br>retired.</div>
-    <div class="lede" style="margin:18px auto 0">You do this on your own now. The app's job on this one is done. That was always the point.</div>`));
-  s.appendChild(div("spacer"));
-  const b=div("btn btn-primary"); b.textContent="Good"; b.onclick=()=>go("home");
-  s.appendChild(b);
-  app.innerHTML=""; app.appendChild(s);
+/* ---------- level-3 (card) ---------- */
+function openCard(t,ci){
+  const fam=FAM[ci];
+  const card=document.getElementById("card");
+  card.style.setProperty("--c",fam.c); card.style.setProperty("--cs",shade(fam.c,0.72));
+  let body=`<div class="c-lab">What it is</div><div class="c-txt">${t.what}</div>`;
+  if(t.how) body+=`<div class="c-lab">How to run it</div><div class="c-txt">${t.how}</div>`;
+  if(t.instead) body+=`<div class="c-lab">Do this instead</div><div class="c-txt">${t.instead}</div>`;
+  card.innerHTML=`
+    <div class="c-head"><div class="c-av">${svg(ICON[t.n],26)}</div><div class="c-nm">${t.n}</div></div>
+    <div class="c-badge">${fam.n}</div>
+    <div class="c-band"></div>
+    ${body}
+    <div class="c-lab">Source</div><div class="c-src">${t.src}</div>
+    <button class="c-btn" id="cardBack">Back to ${fam.n}</button>`;
+  document.getElementById("cardBack").addEventListener("click",closeCard);
+  document.getElementById("cardWrap").classList.add("on");
+  document.getElementById("ctx").textContent=t.n;
 }
+function closeCard(){ document.getElementById("cardWrap").classList.remove("on");
+  document.getElementById("ctx").textContent=`${FAM[curFam].n} · ${T.filter(t=>t.fam.includes(curFam)).length}`; }
+document.getElementById("cardWrap").addEventListener("click",e=>{ if(e.target.id==="cardWrap") closeCard(); });
 
-/* --------------------------- PROFILES ------------------------------ */
-function switchProfile(){
-  const names=DB.profiles.map((p,i)=>`${i+1}. ${p.name}`).join("\n");
-  const choice=prompt(`Profiles:\n${names}\n\nType a number to switch, or a new name to add:`);
-  if(!choice) return;
-  const n=parseInt(choice,10);
-  if(!isNaN(n) && n>=1 && n<=DB.profiles.length){ DB.active=n-1; }
-  else { DB.profiles.push(freshProfile(choice.trim())); DB.active=DB.profiles.length-1; }
-  save(); go("home");
+/* ---------- back / breadcrumb ---------- */
+const backBtn=document.getElementById("back");
+function setBack(html){ backBtn.innerHTML=html; backBtn.classList.add("on"); }
+backBtn.addEventListener("click",()=>{
+  if(level==="family"){
+    level="families";
+    cubeT.classList.add("hide"); cubeF.classList.remove("hide");
+    legend.classList.remove("hide");
+    document.getElementById("hint").textContent="Drag to spin. Tap a family to open it.";
+    document.getElementById("hint").classList.add("fade");
+    document.getElementById("ctx").textContent="All 47 · six families";
+    backBtn.classList.remove("on");
+    setRotation(-18,-28); snapSoon();      /* return to the hero angle, then settle */
+    updateDots();
+  }
+});
+
+/* ---------- rotation engine: rAF-driven, inertia, snaps to the nearest face ---------- */
+let level="families", curFam=0, moved=false;
+let rotX=-18, rotY=-28;          /* current */
+let vX=0, vY=0;                  /* velocity, deg/frame */
+let down=false, lx=0, ly=0, lt=0;
+let mode="rest";                 /* rest | drag | inertia | snap */
+let tX=0, tY=0;                  /* snap target */
+let rafId=null;
+
+function activeCube(){ return level==="family"?cubeT:cubeF; }
+function paint(){ activeCube().style.transform=`rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
+function setRotation(x,y){ rotX=x; rotY=y; vX=vY=0; mode="rest"; paint(); }
+
+function nearestTarget(){
+  tX=Math.max(-90,Math.min(90,Math.round(rotX/90)*90));
+  tY=Math.round(rotY/90)*90;
 }
+function snapSoon(){ nearestTarget(); mode="snap"; run(); }
 
-/* ------------------------------ BOOT ------------------------------- */
-render();
+function tick(){
+  if(mode==="inertia"){
+    rotX+=vX; rotY+=vY;
+    rotX=Math.max(-98,Math.min(98,rotX));
+    vX*=0.93; vY*=0.93;
+    if(Math.abs(vX)<0.12 && Math.abs(vY)<0.12){ nearestTarget(); mode="snap"; }
+    paint(); updateDots();
+  } else if(mode==="snap"){
+    rotX+=(tX-rotX)*0.14; rotY+=(tY-rotY)*0.14;
+    if(Math.abs(tX-rotX)<0.1 && Math.abs(tY-rotY)<0.1){ rotX=tX; rotY=tY; mode="rest"; }
+    paint(); updateDots();
+  }
+  if(mode==="rest" || mode==="drag"){ rafId=null; return; }
+  rafId=requestAnimationFrame(tick);
+}
+function run(){ if(rafId===null) rafId=requestAnimationFrame(tick); }
+
+stage.addEventListener("pointerdown",e=>{
+  if(document.getElementById("cardWrap").classList.contains("on")) return;
+  down=true; moved=false; mode="drag"; vX=vY=0;
+  lx=e.clientX; ly=e.clientY; lt=performance.now();
+  stage.classList.add("grab");
+  pid=e.pointerId;
+});
+let pid=null;
+stage.addEventListener("pointermove",e=>{
+  if(!down) return;
+  const dx=e.clientX-lx, dy=e.clientY-ly;
+  if(!moved && Math.hypot(dx,dy)>7){ moved=true; try{ stage.setPointerCapture(pid); }catch(_){} }
+  if(moved){
+    const k=0.45;
+    rotY+=dx*k; rotX-=dy*k;
+    rotX=Math.max(-98,Math.min(98,rotX));
+    const now=performance.now(), dt=Math.max(1,now-lt);
+    vY=dx*k*(16/dt); vX=-dy*k*(16/dt);      /* velocity normalised to ~60fps frames */
+    lx=e.clientX; ly=e.clientY; lt=now;
+    paint(); updateDots();
+    document.getElementById("hint").classList.add("fade");
+  }
+});
+function endDrag(){
+  if(!down) return;
+  down=false; stage.classList.remove("grab");
+  if(!moved){ mode="rest"; return; }        /* it was a tap; face click handlers fire */
+  if(REDUCED){ nearestTarget(); rotX=tX; rotY=tY; mode="rest"; paint(); updateDots(); return; }
+  const speed=Math.hypot(vX,vY);
+  if(speed>0.5){ mode="inertia"; } else { nearestTarget(); mode="snap"; }
+  run();
+}
+stage.addEventListener("pointerup",endDrag);
+stage.addEventListener("pointercancel",endDrag);
+
+/* keyboard: arrows turn one face */
+window.addEventListener("keydown",e=>{
+  if(document.getElementById("cardWrap").classList.contains("on")){ if(e.key==="Escape") closeCard(); return; }
+  const step={ArrowLeft:[0,90],ArrowRight:[0,-90],ArrowUp:[90,0],ArrowDown:[-90,0]}[e.key];
+  if(!step) return;
+  nearestTarget(); tX=Math.max(-90,Math.min(90,tX+step[0])); tY+=step[1];
+  mode="snap"; run();
+});
+
+/* ---------- boot ---------- */
+sizeCube(); paint();
+let rz; window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>{ sizeCube(); paint(); },120); });
 </script>
 </body>
 </html>
