@@ -158,121 +158,121 @@ const shade = (hex,f)=>{ let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(
 
 /* families: index -> face of level-1 cube (0 front,1 right,2 left,3 top,4 bottom,5 back) */
 const FAM=[
-  {n:"Learn It",    c:"#4a5fa5", bl:"New material, start to finish. Guess, take a swing before you've studied, turn it into a picture, pull it back cold."},
-  {n:"Keep It",     c:"#4e7d5b", bl:"Bring old material back after a gap so it sticks. Guess, space it, review, out."},
-  {n:"Exam",        c:"#a35248", bl:"Get ready for a test. Mix the types, hard-start the hard one, learn from the postmortem."},
-  {n:"Unstuck",     c:"#b8863b", bl:"When you can't start or you stall. It runs from the door to Guess First, where the learning lines begin."},
-  {n:"Why It Works",c:"#6d5a94", bl:"The physics under the network. Not stations, the reasons the routes run the way they do."},
-  {n:"Not On The Map", c:"#75787c", bl:"Feels like studying, isn't. Do the move named on each one instead."},
+  {n:"Learn It",    c:"#4a5fa5", bl:"When you're learning something new. Guess first, try it before you study, turn it into a picture, then try to remember it on your own."},
+  {n:"Keep It",     c:"#4e7d5b", bl:"Bring old material back after some time so it stays in your head. Guess, wait, then review."},
+  {n:"Exam",        c:"#a35248", bl:"Get ready for a test. Mix up the problem types, start with the hardest one, then check your mistakes after."},
+  {n:"Stuck",       c:"#b8863b", bl:"When you can't start or you're frozen. This shows you what to do first."},
+  {n:"Why It Works",c:"#6d5a94", bl:"How your brain actually learns. The reasons behind the other moves."},
+  {n:"Skip These", c:"#75787c", bl:"These feel like studying but don't work. Do the better move instead."},
 ];
 
 /* every technique. fam = family indices it belongs to. content pulled from the app. */
 const T=[
-  {n:`Guess First`, fam:[0,1,2], what:`Before any recall move, call your shot: predict how much you'll get, then find out. The gap between guess and got is the whole game.`, src:`Make It Stick (calibration)`},
-  {n:`Muddiest Point`, fam:[0,1,2], what:`Before you close, name the one thing still fuzzy. It comes back first next time.`, src:`Range (Lovett); Neuroteach (exit ticket)`},
+  {n:`Guess First`, fam:[0,1,2], what:`Before you try to remember something, guess how much you think you'll get right. Then find out. The gap between your guess and the real answer shows you what to study next.`, src:`Make It Stick (calibration)`},
+  {n:`What's Still Fuzzy`, fam:[0,1,2], what:`Before you stop studying, write down the one thing you still don't understand. That's the first thing to check next time.`, src:`Range (Lovett); Neuroteach (exit ticket)`},
 
-  {n:`Try It First`, fam:[0], what:`Take a swing before you've studied it. Wrong answers prime the real one.`, src:`Make It Stick (generation); pretest before a lecture ~10% better later (E. Bjork); 30% study + 70% reciting beats 100% study (Gates 1917)`},
-  {n:`Draw It`, fam:[0], what:`Turn the idea into a picture or diagram. No words.`, how:`Draw it on paper. Make the idea visual: boxes, arrows, a sketch. Then open the book and see what it left out.`, src:`Dual Coding with Teachers; drawing aids retention (Fernandes 2018, Hu 2015)`},
-  {n:`Sketchnote`, fam:[0], what:`Take notes as drawings, arrows and icons instead of sentences, so your hand keeps pace with how fast you think. Words are your slow lane; pictures aren't.`, src:`profile EC-001 Strategy 04; Dual Coding with Teachers`},
-  {n:`Map It`, fam:[0], what:`Lay the material out in space, each piece where it belongs, connected.`, how:`Build the map on paper. Space and arrows do the work, not sentences. Run it after a brain dump, never instead.`, src:`Make It Stick; spatial structures file material`},
-  {n:`Build a Palace`, fam:[0], what:`Place the items along a route you know by heart. Walk it to pull them back.`, how:`One vivid item per spot on a familiar path. Walk it back; the empty spots are what to redo.`, src:`Learning How to Learn (Ch 8); Make It Stick (mnemonics)`},
-  {n:`Crack the Word`, fam:[0], what:`Break a hard word into its root and parts. The meaning is usually built right in.`, how:`Split each word into its pieces and write what each piece means. Build the meaning from the parts.`, src:`Executive Skills in Reading Comprehension (morphology); profile EC-001 Strategy 03`},
-  {n:`Chunk It`, fam:[0], what:`Group a long list into a few labelled bundles. Working memory holds about seven things; a chunk lets one slot carry many.`, src:`Learning How to Learn (Miller 1956)`},
-  {n:`Brain Dump`, fam:[0], what:`Close the book and write everything you remember. No checking, no fixing.`, how:`Go. Everything you remember, don't stop to fix it. Then tick what you covered; whatever's left is what you missed.`, src:`Powerful Teaching; free recall 67% vs concept-map 45% (Karpicke & Blunt 2011)`},
-  {n:`Tell Me Without Looking`, fam:[0], what:`Books closed. Answer from memory, one question at a time.`, src:`Make It Stick; retrieval 71 to 61% vs reread 83 to 40% over a week (Roediger & Karpicke 2006)`},
-  {n:`Teach It Dumber`, fam:[0], what:`Explain it out loud in the simplest words, like teaching a little kid. No notes.`, how:`Teach it, out loud. If you reach for the book, that spot is the gap.`, src:`Protege effect (Stanford teachable agents); output beats input`},
-  {n:`Self-Explain`, fam:[0], what:`Go step by step and say why each step is right, not just what it is. The gaps show up fast.`, src:`Learn Better; Understanding How We Learn`},
-  {n:`Use an Analogy`, fam:[0], what:`Find what the idea works like. "This is the same as ___." Comparison is how you actually understand it.`, src:`Why Don't Students Like School (Holyoak)`},
-  {n:`Make It Concrete`, fam:[0], what:`Turn the abstract idea into your own specific, made-up example.`, how:`Write your example on paper, then a second one that's different. Check each actually fits the rule.`, src:`Understanding How We Learn; Why Don't Students Like School`},
-  {n:`Elaborate`, fam:[0], what:`Connect the new thing to something you already know.`, how:`Finish "X is like ___ because ___" with a real link, not just a word match.`, src:`Make It Stick; elaboration multiplies the cues you can recall by`},
+  {n:`Try It First`, fam:[0], what:`Try to answer before you've studied. Getting it wrong first helps you remember the right answer later.`, src:`Make It Stick (generation); pretest before a lecture ~10% better later (E. Bjork); 30% study + 70% reciting beats 100% study (Gates 1917)`},
+  {n:`Draw It`, fam:[0], what:`Turn the idea into a picture or a drawing. No words.`, how:`Draw it on paper. Use boxes, arrows, or a simple sketch. Then check the book to see what you missed.`, src:`Dual Coding with Teachers; drawing aids retention (Fernandes 2018, Hu 2015)`},
+  {n:`Draw Your Notes`, fam:[0], what:`Take notes using drawings and arrows instead of full sentences. Your hand can draw faster than it can write, so pictures keep up with your thinking.`, src:`profile EC-001 Strategy 04; Dual Coding with Teachers`},
+  {n:`Map It`, fam:[0], what:`Lay the material out on paper. Put each piece where it belongs, and draw lines to connect them.`, how:`Build the map on paper. Use space and arrows, not sentences. Do this after you've already tried to remember everything on your own.`, src:`Make It Stick; spatial structures file material`},
+  {n:`Memory Walk`, fam:[0], what:`Picture a path you know well, like your walk to school. Place each thing you're trying to remember at a spot along that path. Then walk the path in your head to bring them back.`, how:`Pick one clear picture for each spot on the path. Walk through it in your head. Any spot you can't remember is one to study again.`, src:`Learning How to Learn (Ch 8); Make It Stick (mnemonics)`},
+  {n:`Break the Word Apart`, fam:[0], what:`Break a hard word into smaller pieces. The meaning is usually hiding inside the parts.`, how:`Split the word into its pieces and write what each piece means. Put the meaning back together.`, src:`Executive Skills in Reading Comprehension (morphology); profile EC-001 Strategy 03`},
+  {n:`Group It Together`, fam:[0], what:`Group a long list into a few small groups with labels. Your brain can only hold about seven things at once, so a group counts as just one thing.`, src:`Learning How to Learn (Miller 1956)`},
+  {n:`Write Everything Down`, fam:[0], what:`Close the book and write down everything you remember. Don't stop to check or fix anything.`, how:`Write until you run out. Don't stop to fix mistakes. Then check what you got right, whatever's missing is what to study.`, src:`Powerful Teaching; free recall 67% vs concept-map 45% (Karpicke & Blunt 2011)`},
+  {n:`Tell Me Without Looking`, fam:[0], what:`Close the book. Answer questions one at a time, using only your memory.`, src:`Make It Stick; retrieval 71 to 61% vs reread 83 to 40% over a week (Roediger & Karpicke 2006)`},
+  {n:`Teach It Simple`, fam:[0], what:`Say it out loud in the simplest words you can, like you're teaching a little kid. No notes.`, how:`Teach it out loud. If you have to check the book, that's the part you don't know yet.`, src:`Protege effect (Stanford teachable agents); output beats input`},
+  {n:`Explain Each Step`, fam:[0], what:`Go through it step by step. For each step, say out loud why it's right, not just what it is. This shows you fast where you're confused.`, src:`Learn Better; Understanding How We Learn`},
+  {n:`Compare It to Something`, fam:[0], what:`Think about what the idea is like. Finish the sentence: "This is the same as ___." Comparing two things helps you understand both.`, src:`Why Don't Students Like School (Holyoak)`},
+  {n:`Make Your Own Example`, fam:[0], what:`Turn the idea into your own real example.`, how:`Write your example on paper. Then write a second, different example. Check that both really fit the rule.`, src:`Understanding How We Learn; Why Don't Students Like School`},
+  {n:`Connect It to What You Know`, fam:[0], what:`Connect the new thing to something you already know.`, how:`Finish this sentence with a real connection, not just a matching word: "X is like ___ because ___."`, src:`Make It Stick; elaboration multiplies the cues you can recall by`},
 
-  {n:`Space It Out`, fam:[1], what:`Older material, pulled back after a gap so a little forgetting happens.`, src:`Make It Stick; spacing doubles retention at 4 weeks (Rohrer & Taylor 2006)`},
-  {n:`Review As You Learn`, fam:[1], what:`Glance back over today's material the same day, briefly. A little review now saves a lot later.`, src:`Brain Train (RAYL; Ebbinghaus)`},
+  {n:`Space It Out`, fam:[1], what:`Go back to older material after some time has passed, so you forget a little before you review it.`, src:`Make It Stick; spacing doubles retention at 4 weeks (Rohrer & Taylor 2006)`},
+  {n:`Look Back Today`, fam:[1], what:`Look back over what you learned today, the same day, just for a few minutes. A short review now saves a lot of time later.`, src:`Brain Train (RAYL; Ebbinghaus)`},
 
-  {n:`Mix It`, fam:[2], what:`Practice related problem types together, sorting which is which before solving.`, src:`Make It Stick; 77% interleaved vs 38% blocked at 24h (Taylor & Rohrer 2010); similar types only`},
-  {n:`Hard-Start`, fam:[2], what:`In a test, start a hard question, then leave it and do the easy ones. Your background brain chews on the hard one while you bank marks.`, src:`Uncommon Sense Teaching (hard-start)`},
-  {n:`Exam Postmortem`, fam:[2], what:`After a test, sort your mistakes by type. The pattern tells you exactly what to fix next time.`, src:`Ace Your Exam (five error types)`},
+  {n:`Mix Up the Problems`, fam:[2], what:`Practice different types of problems mixed together. Figure out which type each one is before you solve it.`, src:`Make It Stick; 77% interleaved vs 38% blocked at 24h (Taylor & Rohrer 2010); similar types only`},
+  {n:`Start With the Hard One`, fam:[2], what:`On a test, start the hardest question first. Then leave it and do the easy ones. Your brain keeps working on the hard one in the background while you finish the rest.`, src:`Uncommon Sense Teaching (hard-start)`},
+  {n:`Check Your Mistakes`, fam:[2], what:`After a test, look at what you got wrong and sort the mistakes into groups. The pattern shows you exactly what to fix next time.`, src:`Ace Your Exam (five error types)`},
 
-  {n:`Get Started`, fam:[3], what:`The hardest part is starting. Do just the first two minutes, on purpose badly. Momentum does the rest.`, src:`Smart but Scattered Teens (task initiation)`},
-  {n:`Plan It`, fam:[3], what:`Break the work into steps and put them in order before you start. A plan beats willpower.`, src:`Smart but Scattered Teens (planning)`},
-  {n:`Find the Hook`, fam:[3], what:`Before you start, find one reason this matters to you. Material you care about sticks harder.`, src:`Learn Better (learn crafting)`},
-  {n:`Set a Process Goal`, fam:[3], what:`Aim at "do ten problems," not "get an A." You control the effort, not the grade.`, src:`Learn Better (process vs outcome goals)`},
-  {n:`Study Somewhere New`, fam:[3], what:`Change where you study sometimes. Different places give your memory more hooks to find it by.`, src:`How We Learn (context variability)`},
-  {n:`Sprint and Break`, fam:[3], what:`Work one focused sprint of about 25 minutes, then a real break. The break is when it sinks in, not wasted time.`, src:`Uncommon Sense Teaching (Pomodoro; brain breaks)`},
-  {n:`Walk It Off`, fam:[3], what:`Stuck? Leave it and move. Your background brain keeps working and often hands you the answer.`, src:`How We Learn (incubation; focused vs diffuse)`},
-  {n:`Steady the Nerves`, fam:[3], what:`When it tips from hard into panic, stop and breathe; hard is fine, panic isn't. The way out of putting it off is one small first step, not a big push.`, src:`Neuroteach (amygdala; zone of proximal discomfort); Ace Your Exam`},
+  {n:`Get Started`, fam:[3], what:`Starting is the hardest part. Do just the first two minutes, even if you do them badly on purpose. Once you start, it gets easier to keep going.`, src:`Smart but Scattered Teens (task initiation)`},
+  {n:`Plan It`, fam:[3], what:`Break the work into steps. Put the steps in order before you start. A plan works better than just trying hard.`, src:`Smart but Scattered Teens (planning)`},
+  {n:`Find a Reason to Care`, fam:[3], what:`Before you start, find one reason this matters to you. You remember things better when you care about them.`, src:`Learn Better (learn crafting)`},
+  {n:`Set a Goal You Control`, fam:[3], what:`Aim for something you control, like "do ten problems," instead of something you don't, like "get an A."`, src:`Learn Better (process vs outcome goals)`},
+  {n:`Study Somewhere New`, fam:[3], what:`Change where you study sometimes. Studying in different places gives your memory more ways to find the answer later.`, src:`How We Learn (context variability)`},
+  {n:`Work, Then Rest`, fam:[3], what:`Work hard for about 25 minutes. Then take a real break. The break is when your brain locks in what you learned, it's not wasted time.`, src:`Uncommon Sense Teaching (Pomodoro; brain breaks)`},
+  {n:`Take a Walk`, fam:[3], what:`If you're stuck, stop and move around. Your brain keeps working in the background and often hands you the answer later.`, src:`How We Learn (incubation; focused vs diffuse)`},
+  {n:`Calm Down First`, fam:[3], what:`When you go from feeling challenged to feeling panicked, stop and take a breath. Feeling challenged is normal, panic isn't. The way out isn't a big push, it's one small first step.`, src:`Neuroteach (amygdala; zone of proximal discomfort); Ace Your Exam`},
 
-  {n:`Race-Car vs Hiker Brain`, fam:[4], what:`Fast processors (race-cars) get there quick but skim the scenery; slower ones (hikers) catch more detail. Neither is smarter. Yours is a race-car, so slowing down on purpose is your edge.`, src:`Uncommon Sense Teaching`},
-  {n:`The Two Illusions`, fam:[4], what:`Why "I get it" lies: rereading feels easy (that's fluency), and feeling sure isn't being right (that's confidence). The guess catches both.`, src:`Powerful Teaching`},
-  {n:`Forget a Little, Learn More`, fam:[4], what:`Forgetting a bit between sessions isn't failing. The effort to pull it back is what makes it stick harder.`, src:`How We Learn (Bjork)`},
-  {n:`Learn It, Link It`, fam:[4], what:`Memory is connections. A new fact sticks when it hooks onto something you already know.`, src:`Uncommon Sense Teaching (Hebbian learning)`},
-  {n:`Two Kinds of Learning`, fam:[4], what:`Facts and skills travel different routes in your brain. Skills need doing, spread over time; you can't cram them in.`, src:`Uncommon Sense Teaching (declarative vs procedural)`},
-  {n:`Deep vs Surface`, fam:[4], what:`Beginners sort problems by how they look; experts sort by what's really going on underneath. Mixing problems trains that.`, src:`Learn Better`},
-  {n:`Practice Rewires You`, fam:[4], what:`Repetition physically speeds up your brain's wiring. Getting faster is real, not just a feeling.`, src:`Neuroteach (myelination)`},
-  {n:`Why Breaks Solve It`, fam:[4], what:`Your brain has a tight focused mode and a loose background mode. The stuck problem often cracks in the loose one, on a walk.`, src:`Learning How to Learn (focused vs diffuse)`},
-  {n:`Start and End Stick Most`, fam:[4], what:`You remember the beginning and end of a session best. Put the important stuff there, not buried in the middle.`, src:`Neuroteach (primacy-recency)`},
-  {n:`Why School Is Hard`, fam:[4], what:`Your brain evolved for faces and talking, not reading and algebra. Those take deliberate practice; struggling with them is normal.`, src:`Uncommon Sense Teaching (biologically primary vs secondary)`},
-  {n:`Wrong First, Right Later`, fam:[4], what:`Taking a real swing and missing primes your brain for the answer. The wrong attempt is the learning, not a fail.`, src:`Learn Better (productive failure, Kapur)`},
-  {n:`Knowledge Before Thinking`, fam:[4], what:`You can't think hard about something you barely know. Facts first are what make the clever stuff possible.`, src:`Why Don't Students Like School`},
-  {n:`Ability Is Built`, fam:[4], what:`Smart isn't fixed. Effort and the right practice grow it; your brain changes when you push it.`, src:`Neuroteach (growth mindset)`},
-  {n:`Sleep Saves It`, fam:[4], what:`Sleep is when the day's learning gets filed into long-term memory. A late cram you don't sleep on barely counts.`, src:`Neuroteach (sleep)`},
-  {n:`The Unfinished Problem`, fam:[4], what:`Leave a problem half-done and your mind keeps it active in the background, picking up clues. You can use that on purpose.`, src:`How We Learn (Zeigarnik; percolation)`},
+  {n:`Fast Brain, Slow Brain`, fam:[4], what:`Some brains work fast but miss small details, like a race car. Some work slower but notice more, like a hiker. Neither one is smarter. If your brain is the fast kind, slowing down on purpose is your advantage.`, src:`Uncommon Sense Teaching`},
+  {n:`Two Tricks Your Brain Plays`, fam:[4], what:`Rereading feels easy, so it feels like it's working, but that's a trick. Feeling sure of yourself isn't the same as being right, that's another trick. Guessing before you check catches both.`, src:`Powerful Teaching`},
+  {n:`A Little Forgetting Helps`, fam:[4], what:`Forgetting a bit between study sessions isn't a bad sign. The work it takes to remember it again is what makes it stick.`, src:`How We Learn (Bjork)`},
+  {n:`New Facts Need Old Facts`, fam:[4], what:`Memory works by making connections. A new fact sticks when it hooks onto something you already know.`, src:`Uncommon Sense Teaching (Hebbian learning)`},
+  {n:`Two Kinds of Learning`, fam:[4], what:`Facts and skills are learned in different ways. Skills need practice spread out over time, you can't learn a skill in one night.`, src:`Uncommon Sense Teaching (declarative vs procedural)`},
+  {n:`Look Past the Surface`, fam:[4], what:`Beginners sort problems by how they look on the outside. Experts sort by what's really happening underneath. Mixing up problem types trains you to think like an expert.`, src:`Learn Better`},
+  {n:`Practice Changes Your Brain`, fam:[4], what:`Practicing something over and over actually speeds up the wiring in your brain. Getting faster is real, it's not just a feeling.`, src:`Neuroteach (myelination)`},
+  {n:`Breaks Help You Solve It`, fam:[4], what:`Your brain has a focused mode and a relaxed background mode. A problem you're stuck on often gets solved in the relaxed mode, like on a walk.`, src:`Learning How to Learn (focused vs diffuse)`},
+  {n:`You Remember the Start and End`, fam:[4], what:`You remember the beginning and the end of a study session best. Put the most important stuff there, not buried in the middle.`, src:`Neuroteach (primacy-recency)`},
+  {n:`Why School Feels Hard`, fam:[4], what:`Your brain grew up learning to talk and read faces, not to read books or do algebra. Those skills take real practice. Struggling with them is normal, not a sign something's wrong.`, src:`Uncommon Sense Teaching (biologically primary vs secondary)`},
+  {n:`Mistakes Help You Learn`, fam:[4], what:`Taking a real guess and getting it wrong actually helps your brain remember the right answer later. The wrong try is part of learning, not a failure.`, src:`Learn Better (productive failure, Kapur)`},
+  {n:`Learn Facts First`, fam:[4], what:`You can't think deeply about something you barely know. Learning the facts first is what makes deeper thinking possible.`, src:`Why Don't Students Like School`},
+  {n:`Smart Grows With Practice`, fam:[4], what:`Being smart isn't something you're born with and stuck with. Effort and the right kind of practice grow it. Your brain actually changes when you push it.`, src:`Neuroteach (growth mindset)`},
+  {n:`Sleep Locks In Learning`, fam:[4], what:`Sleep is when your brain files away what you learned that day into long-term memory. Cramming late without sleeping on it barely helps.`, src:`Neuroteach (sleep)`},
+  {n:`Leaving It Half-Done Helps`, fam:[4], what:`If you leave a problem half-finished, your brain keeps working on it in the background. You can use that on purpose by stepping away before you're totally stuck.`, src:`How We Learn (Zeigarnik; percolation)`},
 
-  {n:`Rereading`, fam:[5], what:`Reading your notes again. Feels like studying. Mostly isn't. In one study, people who reread were down to 40% a week later, and thought they'd remember more than people who tested themselves. Pulling it from memory with the book closed is what sticks.`, instead:`Brain Dump`, src:`Do this instead: Brain Dump`},
-  {n:`Highlighting`, fam:[5], what:`Colouring the page. Feels active. But the marking isn't the learning, the remembering is. A bright page can hide how little is actually in your head.`, instead:`Tell Me Without Looking`, src:`Do this instead: Tell Me Without Looking`},
-  {n:`Neat Recopied Notes`, fam:[5], what:`Rewriting your notes to look tidy. It's copying, not recalling. A pretty page hides how little is actually in your head.`, instead:`Map It`, src:`Do this instead: Map It`},
+  {n:`Reading It Again`, fam:[5], what:`Reading your notes over and over feels like studying, but it mostly isn't. In one study, people who reread scored 40% on a test a week later, and they thought they'd remember more than they actually did. Trying to remember with the book closed is what actually works.`, instead:`Write Everything Down`, src:`Do this instead: Brain Dump`},
+  {n:`Highlighting`, fam:[5], what:`Coloring the page with a highlighter feels active, but marking words isn't the same as learning them. A bright page can trick you into thinking you know more than you do.`, instead:`Tell Me Without Looking`, src:`Do this instead: Tell Me Without Looking`},
+  {n:`Copying Notes Over`, fam:[5], what:`Rewriting your notes to make them neat is copying, not remembering. A pretty page can trick you into thinking you know more than you do.`, instead:`Map It`, src:`Do this instead: Map It`},
 ];
 
 /* ---------- one icon per technique (simple monoline glyphs) ---------- */
 function svg(inner,sz){ sz=sz||20; return '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(inner||'<circle cx="12" cy="12" r="3"/>')+'</svg>'; }
 const ICON={
   "Guess First":`<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>`,
-  "Muddiest Point":`<line x1="5" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="19" y2="12"/><line x1="5" y1="16" x2="14" y2="16"/>`,
-  "Brain Dump":`<path d="M4 14v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/><line x1="12" y1="3" x2="12" y2="14"/><polyline points="8 10 12 14 16 10"/>`,
+  "What's Still Fuzzy":`<line x1="5" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="19" y2="12"/><line x1="5" y1="16" x2="14" y2="16"/>`,
+  "Write Everything Down":`<path d="M4 14v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/><line x1="12" y1="3" x2="12" y2="14"/><polyline points="8 10 12 14 16 10"/>`,
   "Tell Me Without Looking":`<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6"/><circle cx="12" cy="12" r="2.5"/><line x1="3" y1="3" x2="21" y2="21"/>`,
   "Space It Out":`<line x1="3" y1="12" x2="21" y2="12"/><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="10" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.4" fill="currentColor" stroke="none"/>`,
   "Try It First":`<polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2"/>`,
   "Draw It":`<path d="M4 20l3-1 11-11-2-2L5 17l-1 3z"/><line x1="14" y1="6" x2="18" y2="10"/>`,
-  "Sketchnote":`<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 9c2 2 4-2 6 0s3-1 4 0"/>`,
+  "Draw Your Notes":`<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 9c2 2 4-2 6 0s3-1 4 0"/>`,
   "Map It":`<circle cx="6" cy="6" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="10" cy="18" r="2"/><line x1="7.4" y1="7.4" x2="8.6" y2="16.6"/><line x1="7.8" y1="6.4" x2="16" y2="7.6"/>`,
-  "Build a Palace":`<path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/>`,
-  "Crack the Word":`<rect x="3" y="9" width="18" height="6" rx="1"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="15" y1="9" x2="15" y2="15"/>`,
-  "Chunk It":`<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>`,
-  "Teach It Dumber":`<path d="M2 9l10-4 10 4-10 4-10-4z"/><path d="M6 11v4c0 1 3 2 6 2s6-1 6-2v-4"/>`,
-  "Self-Explain":`<path d="M4 5h16v10H9l-4 4v-4H4z"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/>`,
-  "Use an Analogy":`<circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/>`,
-  "Make It Concrete":`<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5l8 4.5 8-4.5"/><line x1="12" y1="12" x2="12" y2="21"/>`,
-  "Elaborate":`<rect x="3" y="9" width="11" height="6" rx="3"/><rect x="10" y="9" width="11" height="6" rx="3"/>`,
-  "Review As You Learn":`<path d="M20 12a8 8 0 1 1-2.3-5.6"/><polyline points="20 4 20 8 16 8"/>`,
-  "Mix It":`<path d="M4 7h4l8 10h4"/><path d="M4 17h4l8-10h4"/><polyline points="17 4 20 7 17 10"/><polyline points="17 14 20 17 17 20"/>`,
-  "Hard-Start":`<path d="M3 19l6-11 4 6 2-3 6 8z"/>`,
-  "Exam Postmortem":`<circle cx="10" cy="10" r="6"/><line x1="15" y1="15" x2="20" y2="20"/>`,
+  "Memory Walk":`<path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/>`,
+  "Break the Word Apart":`<rect x="3" y="9" width="18" height="6" rx="1"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="15" y1="9" x2="15" y2="15"/>`,
+  "Group It Together":`<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>`,
+  "Teach It Simple":`<path d="M2 9l10-4 10 4-10 4-10-4z"/><path d="M6 11v4c0 1 3 2 6 2s6-1 6-2v-4"/>`,
+  "Explain Each Step":`<path d="M4 5h16v10H9l-4 4v-4H4z"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/>`,
+  "Compare It to Something":`<circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/>`,
+  "Make Your Own Example":`<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5l8 4.5 8-4.5"/><line x1="12" y1="12" x2="12" y2="21"/>`,
+  "Connect It to What You Know":`<rect x="3" y="9" width="11" height="6" rx="3"/><rect x="10" y="9" width="11" height="6" rx="3"/>`,
+  "Look Back Today":`<path d="M20 12a8 8 0 1 1-2.3-5.6"/><polyline points="20 4 20 8 16 8"/>`,
+  "Mix Up the Problems":`<path d="M4 7h4l8 10h4"/><path d="M4 17h4l8-10h4"/><polyline points="17 4 20 7 17 10"/><polyline points="17 14 20 17 17 20"/>`,
+  "Start With the Hard One":`<path d="M3 19l6-11 4 6 2-3 6 8z"/>`,
+  "Check Your Mistakes":`<circle cx="10" cy="10" r="6"/><line x1="15" y1="15" x2="20" y2="20"/>`,
   "Get Started":`<polygon points="7 4 20 12 7 20 7 4"/>`,
   "Plan It":`<rect x="5" y="4" width="14" height="17" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>`,
-  "Find the Hook":`<path d="M12 20s-7-4.5-7-9a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 4.5-7 9-7 9z"/>`,
-  "Set a Process Goal":`<line x1="6" y1="3" x2="6" y2="21"/><path d="M6 4h11l-2.5 3.5L17 11H6"/>`,
+  "Find a Reason to Care":`<path d="M12 20s-7-4.5-7-9a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 4.5-7 9-7 9z"/>`,
+  "Set a Goal You Control":`<line x1="6" y1="3" x2="6" y2="21"/><path d="M6 4h11l-2.5 3.5L17 11H6"/>`,
   "Study Somewhere New":`<path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>`,
-  "Sprint and Break":`<circle cx="12" cy="13" r="7"/><line x1="12" y1="13" x2="12" y2="9"/><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="2" x2="12" y2="4"/>`,
-  "Walk It Off":`<circle cx="13" cy="4" r="2"/><path d="M13 6l-2 6 3 3"/><path d="M11 12l-3 2"/><path d="M13 8l3 2"/>`,
-  "Steady the Nerves":`<path d="M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/>`,
-  "Race-Car vs Hiker Brain":`<path d="M3 14l2-4h14l2 4v3H3z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/>`,
-  "The Two Illusions":`<circle cx="10" cy="12" r="6"/><circle cx="14" cy="12" r="6" stroke-dasharray="2 2"/>`,
-  "Forget a Little, Learn More":`<circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><polyline points="12 7 12 12 16 14"/>`,
-  "Learn It, Link It":`<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="12" r="2.5"/><line x1="8.5" y1="12" x2="15.5" y2="12"/>`,
+  "Work, Then Rest":`<circle cx="12" cy="13" r="7"/><line x1="12" y1="13" x2="12" y2="9"/><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="2" x2="12" y2="4"/>`,
+  "Take a Walk":`<circle cx="13" cy="4" r="2"/><path d="M13 6l-2 6 3 3"/><path d="M11 12l-3 2"/><path d="M13 8l3 2"/>`,
+  "Calm Down First":`<path d="M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/>`,
+  "Fast Brain, Slow Brain":`<path d="M3 14l2-4h14l2 4v3H3z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/>`,
+  "Two Tricks Your Brain Plays":`<circle cx="10" cy="12" r="6"/><circle cx="14" cy="12" r="6" stroke-dasharray="2 2"/>`,
+  "A Little Forgetting Helps":`<circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><polyline points="12 7 12 12 16 14"/>`,
+  "New Facts Need Old Facts":`<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="12" r="2.5"/><line x1="8.5" y1="12" x2="15.5" y2="12"/>`,
   "Two Kinds of Learning":`<path d="M12 20v-5l-5-5V4"/><path d="M12 15l5-5V4"/>`,
-  "Deep vs Surface":`<line x1="3" y1="9" x2="21" y2="9"/><path d="M8 9l4-4 4 4-1.5 9h-5z"/>`,
-  "Practice Rewires You":`<polyline points="4 16 9 11 13 15 20 6"/><polyline points="15 6 20 6 20 11"/>`,
-  "Why Breaks Solve It":`<path d="M5 8h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8z"/><path d="M16 9h2a2 2 0 0 1 0 4h-2"/>`,
-  "Start and End Stick Most":`<line x1="5" y1="5" x2="5" y2="19"/><line x1="10" y1="13" x2="10" y2="19"/><line x1="14" y1="13" x2="14" y2="19"/><line x1="19" y1="5" x2="19" y2="19"/>`,
-  "Why School Is Hard":`<path d="M4 20h4v-4h4v-4h4v-4h4"/>`,
-  "Wrong First, Right Later":`<path d="M4 8l4 4"/><path d="M8 8l-4 4"/><polyline points="12 11 15 14 20 7"/>`,
-  "Knowledge Before Thinking":`<rect x="6" y="14" width="12" height="5" rx="1"/><rect x="8" y="9" width="8" height="5" rx="1"/><rect x="10" y="4" width="4" height="5" rx="1"/>`,
-  "Ability Is Built":`<path d="M12 21v-8"/><path d="M12 13c-3 0-5-2-5-5 3 0 5 2 5 5z"/><path d="M12 15c3 0 5-2 5-5-3 0-5 2-5 5z"/>`,
-  "Sleep Saves It":`<path d="M20 14a8 8 0 1 1-9-11 6 6 0 0 0 9 11z"/>`,
-  "The Unfinished Problem":`<path d="M12 4a8 8 0 1 1-6 3"/>`,
-  "Rereading":`<path d="M4 5h6a2 2 0 0 1 2 2v11a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v11a2 2 0 0 1 2-2h6z"/><line x1="3" y1="21" x2="21" y2="3"/>`,
+  "Look Past the Surface":`<line x1="3" y1="9" x2="21" y2="9"/><path d="M8 9l4-4 4 4-1.5 9h-5z"/>`,
+  "Practice Changes Your Brain":`<polyline points="4 16 9 11 13 15 20 6"/><polyline points="15 6 20 6 20 11"/>`,
+  "Breaks Help You Solve It":`<path d="M5 8h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8z"/><path d="M16 9h2a2 2 0 0 1 0 4h-2"/>`,
+  "You Remember the Start and End":`<line x1="5" y1="5" x2="5" y2="19"/><line x1="10" y1="13" x2="10" y2="19"/><line x1="14" y1="13" x2="14" y2="19"/><line x1="19" y1="5" x2="19" y2="19"/>`,
+  "Why School Feels Hard":`<path d="M4 20h4v-4h4v-4h4v-4h4"/>`,
+  "Mistakes Help You Learn":`<path d="M4 8l4 4"/><path d="M8 8l-4 4"/><polyline points="12 11 15 14 20 7"/>`,
+  "Learn Facts First":`<rect x="6" y="14" width="12" height="5" rx="1"/><rect x="8" y="9" width="8" height="5" rx="1"/><rect x="10" y="4" width="4" height="5" rx="1"/>`,
+  "Smart Grows With Practice":`<path d="M12 21v-8"/><path d="M12 13c-3 0-5-2-5-5 3 0 5 2 5 5z"/><path d="M12 15c3 0 5-2 5-5-3 0-5 2-5 5z"/>`,
+  "Sleep Locks In Learning":`<path d="M20 14a8 8 0 1 1-9-11 6 6 0 0 0 9 11z"/>`,
+  "Leaving It Half-Done Helps":`<path d="M12 4a8 8 0 1 1-6 3"/>`,
+  "Reading It Again":`<path d="M4 5h6a2 2 0 0 1 2 2v11a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v11a2 2 0 0 1 2-2h6z"/><line x1="3" y1="21" x2="21" y2="3"/>`,
   "Highlighting":`<rect x="4" y="10" width="14" height="5" rx="1"/><line x1="3" y1="20" x2="20" y2="4"/>`,
-  "Neat Recopied Notes":`<rect x="4" y="5" width="10" height="13" rx="1"/><rect x="9" y="8" width="10" height="13" rx="1"/><line x1="3" y1="21" x2="21" y2="4"/>`,
+  "Copying Notes Over":`<rect x="4" y="5" width="10" height="13" rx="1"/><rect x="9" y="8" width="10" height="13" rx="1"/><line x1="3" y1="21" x2="21" y2="4"/>`,
 };
 
 /* ---------- responsive sizing: one number drives geometry and type ---------- */
@@ -317,13 +317,7 @@ const dotsEl=document.getElementById("dots");
 function buildDots(n){
   dotsEl.innerHTML="";
   for(let i=0;i<n;i++){ const d=document.createElement("div"); d.className="dot"; dotsEl.appendChild(d); }
-}
-function updateDots(){
-  if(level!=="family" || shape==="panel" || faceCount<2){ dotsEl.classList.add("hide"); return; }
-  dotsEl.classList.remove("hide");
-  const step=360/faceCount;
-  const fi=((Math.round(-rotY/step))%faceCount+faceCount)%faceCount;
-  [...dotsEl.children].forEach((d,i)=>d.classList.toggle("on",i===fi));
+  lastDot=-1;
 }
 
 /* ---------- level-2: shape follows the count ----------
@@ -341,7 +335,7 @@ function makeCell(t,fam,first,ci){
 function openFamily(ci){
   const fam=FAM[ci]; curFam=ci;
   const items=T.filter(t=>t.fam.includes(ci));
-  const first=FAM[ci].n==="Not On The Map"?null:items[0];   /* anti-patterns get no start marker */
+  const first=FAM[ci].n==="Skip These"?null:items[0];   /* anti-patterns get no start marker */
   level="family";
   cubeF.classList.add("hide"); legend.classList.add("hide");
 
@@ -426,15 +420,20 @@ backBtn.addEventListener("click",()=>{
   }
 });
 
-/* ---------- rotation engine: rAF-driven, inertia, snaps to the nearest face ---------- */
+/* ---------- rotation engine ----------
+   pointermove only records input; painting happens once per frame in the loop.
+   release projects momentum to pick the target face (a committed swipe always
+   advances), then a spring that inherits release velocity settles onto it. */
 let level="families", curFam=0, moved=false;
 let shape="cube", faceCount=6;   /* cube | prism | flip | panel */
 let rotX=-18, rotY=-28;          /* current */
 let vX=0, vY=0;                  /* velocity, deg/frame */
-let down=false, lx=0, ly=0, lt=0;
-let mode="rest";                 /* rest | drag | inertia | snap */
-let tX=0, tY=0;                  /* snap target */
-let rafId=null;
+let down=false, lx=0, ly=0, lt=0, pid=null;
+let startX=0, startY=0;          /* rotation at drag start */
+let pendX=0, pendY=0;            /* input accumulated since last frame */
+let mode="rest";                 /* rest | drag | settle */
+let tX=0, tY=0;                  /* settle target */
+let rafId=null, lastDot=-1;
 
 const groundEl=document.getElementById("ground");
 function placeGround(){
@@ -452,64 +451,94 @@ function paint(){
   const el=level==="family"?cubeT:cubeF;
   el.style.transform=`rotateX(${rotX}deg) rotateY(${rotY}deg)`;
 }
-function setRotation(x,y){ rotX=x; rotY=y; vX=vY=0; mode="rest"; paint(); }
+function setRotation(x,y){ rotX=x; rotY=y; vX=vY=0; mode="rest"; lastDot=-1; paint(); }
 
 function snapStepY(){ return shape==="flip"?180:90; }
-function nearestTarget(){
-  tX=shape==="cube"?Math.max(-90,Math.min(90,Math.round(rotX/90)*90)):0;
-  const s=snapStepY();
-  tY=Math.round(rotY/s)*s;
+function refreshDots(){
+  if(level!=="family" || faceCount<2) return;
+  const step=360/faceCount;
+  const fi=((Math.round(-rotY/step))%faceCount+faceCount)%faceCount;
+  if(fi!==lastDot){ lastDot=fi; [...dotsEl.children].forEach((d,i)=>d.classList.toggle("on",i===fi)); }
 }
-function snapSoon(){ nearestTarget(); mode="snap"; run(); }
+
+/* pick targets from momentum; a committed drag never springs back */
+function chooseTargets(){
+  const step=snapStepY();
+  const projY=rotY + vY*12;                    /* deceleration projection */
+  tY=Math.round(projY/step)*step;
+  const homeY=Math.round(startY/step)*step;
+  const dY=rotY-startY;
+  if(tY===homeY && Math.abs(dY)>step*0.22) tY=homeY+Math.sign(dY)*step;
+  if(shape==="cube"){
+    const projX=rotX + vX*12;
+    tX=Math.max(-90,Math.min(90,Math.round(projX/90)*90));
+    const homeX=Math.max(-90,Math.min(90,Math.round(startX/90)*90));
+    const dX=rotX-startX;
+    if(tX===homeX && Math.abs(dX)>20) tX=Math.max(-90,Math.min(90,homeX+Math.sign(dX)*90));
+  } else tX=0;
+}
+function settleTo(x,y){ tX=x; tY=y; mode="settle"; run(); }
+function snapSoon(){ chooseTargets(); mode="settle"; run(); }
 
 function tick(){
-  if(mode==="inertia"){
-    rotX+=vX; rotY+=vY;
-    rotX=Math.max(-98,Math.min(98,rotX));
-    vX*=0.93; vY*=0.93;
-    if(Math.abs(vX)<0.12 && Math.abs(vY)<0.12){ nearestTarget(); mode="snap"; }
-    paint(); updateDots();
-  } else if(mode==="snap"){
-    rotX+=(tX-rotX)*0.14; rotY+=(tY-rotY)*0.14;
-    if(Math.abs(tX-rotX)<0.1 && Math.abs(tY-rotY)<0.1){ rotX=tX; rotY=tY; mode="rest"; }
-    paint(); updateDots();
+  if(mode==="drag"){
+    rotY+=pendY;
+    if(shape==="cube"){
+      let nx=rotX+pendX;
+      if(nx>90) nx=90+(nx-90)*0.3;             /* rubber band past the pole */
+      if(nx<-90) nx=-90+(nx+90)*0.3;
+      rotX=nx;
+    }
+    pendX=pendY=0;
+    paint(); refreshDots();
+  } else if(mode==="settle"){
+    /* spring seeded with release velocity: continuous motion, no hitch */
+    vY=vY*0.82+(tY-rotY)*0.09; rotY+=vY;
+    vX=vX*0.82+(tX-rotX)*0.09; rotX+=vX;
+    if(Math.abs(tY-rotY)<0.05 && Math.abs(vY)<0.05 && Math.abs(tX-rotX)<0.05 && Math.abs(vX)<0.05){
+      rotX=tX; rotY=tY; vX=vY=0; mode="rest";
+    }
+    paint(); refreshDots();
   }
-  if(mode==="rest" || mode==="drag"){ rafId=null; return; }
+  if(mode==="rest"){ rafId=null; updateDots(); return; }
   rafId=requestAnimationFrame(tick);
 }
 function run(){ if(rafId===null) rafId=requestAnimationFrame(tick); }
+function updateDots(){
+  if(level!=="family" || shape==="panel" || faceCount<2){ dotsEl.classList.add("hide"); return; }
+  dotsEl.classList.remove("hide"); refreshDots();
+}
 
 stage.addEventListener("pointerdown",e=>{
+  if(down) return;                             /* ignore a second finger */
   if(document.getElementById("cardWrap").classList.contains("on")) return;
-  down=true; moved=false; vX=vY=0;
-  if(rotatable()){ mode="drag"; stage.classList.add("grab"); }
+  down=true; moved=false; vX=vY=0; pendX=pendY=0;
+  startX=rotX; startY=rotY;
+  if(rotatable()){ mode="drag"; stage.classList.add("grab"); run(); }
   lx=e.clientX; ly=e.clientY; lt=performance.now();
   pid=e.pointerId;
 });
-let pid=null;
 stage.addEventListener("pointermove",e=>{
-  if(!down) return;
+  if(!down || e.pointerId!==pid) return;
   const dx=e.clientX-lx, dy=e.clientY-ly;
   if(!moved && Math.hypot(dx,dy)>7){ moved=true; if(rotatable()){ try{ stage.setPointerCapture(pid); }catch(_){} } }
   if(moved && rotatable()){
     const k=0.45;
-    rotY+=dx*k;
-    if(shape==="cube"){ rotX-=dy*k; rotX=Math.max(-98,Math.min(98,rotX)); }
+    pendY+=dx*k;
+    if(shape==="cube") pendX+=-dy*k;
     const now=performance.now(), dt=Math.max(1,now-lt);
-    vY=dx*k*(16/dt); vX=shape==="cube"?-dy*k*(16/dt):0;   /* velocity normalised to ~60fps frames */
+    const iY=dx*k*(16/dt), iX=shape==="cube"?-dy*k*(16/dt):0;
+    vY=vY*0.6+iY*0.4; vX=vX*0.6+iX*0.4;        /* smoothed release velocity */
     lx=e.clientX; ly=e.clientY; lt=now;
-    paint(); updateDots();
     document.getElementById("hint").classList.add("fade");
   }
 });
-function endDrag(){
-  if(!down) return;
-  down=false; stage.classList.remove("grab");
-  if(!moved || !rotatable()){ mode="rest"; return; }   /* tap, or a flat panel: face click handlers fire */
-  if(REDUCED){ nearestTarget(); rotX=tX; rotY=tY; mode="rest"; paint(); updateDots(); return; }
-  const speed=Math.hypot(vX,vY);
-  if(speed>0.5){ mode="inertia"; } else { nearestTarget(); mode="snap"; }
-  run();
+function endDrag(e){
+  if(!down || (e && e.pointerId!==pid)) return;
+  down=false; pid=null; stage.classList.remove("grab");
+  if(!moved || !rotatable()){ mode="rest"; return; }   /* tap, or a flat panel */
+  if(REDUCED){ chooseTargets(); rotX=tX; rotY=tY; vX=vY=0; mode="rest"; paint(); updateDots(); return; }
+  chooseTargets(); mode="settle"; run();
 }
 stage.addEventListener("pointerup",endDrag);
 stage.addEventListener("pointercancel",endDrag);
@@ -518,14 +547,13 @@ stage.addEventListener("pointercancel",endDrag);
 window.addEventListener("keydown",e=>{
   if(document.getElementById("cardWrap").classList.contains("on")){ if(e.key==="Escape") closeCard(); return; }
   if(!rotatable()) return;
-  const s=snapStepY();
-  const step={ArrowLeft:[0,s],ArrowRight:[0,-s],ArrowUp:[90,0],ArrowDown:[-90,0]}[e.key];
+  const s2=snapStepY();
+  const step={ArrowLeft:[0,s2],ArrowRight:[0,-s2],ArrowUp:[90,0],ArrowDown:[-90,0]}[e.key];
   if(!step) return;
   if(shape!=="cube" && step[0]!==0) return;   /* single-axis shapes ignore up/down */
-  nearestTarget();
-  if(shape==="cube") tX=Math.max(-90,Math.min(90,tX+step[0]));
-  tY+=step[1];
-  mode="snap"; run();
+  const bx=shape==="cube"?Math.max(-90,Math.min(90,Math.round(rotX/90)*90)):0;
+  const by=Math.round(rotY/s2)*s2;
+  settleTo(shape==="cube"?Math.max(-90,Math.min(90,bx+step[0])):0, by+step[1]);
 });
 
 /* ---------- boot ---------- */
